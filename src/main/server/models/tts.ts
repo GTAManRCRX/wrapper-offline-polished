@@ -6,6 +6,46 @@ import { URLSearchParams } from "url";
 import { brotliDecompress } from "zlib";
 import crypto from "crypto";
 
+const VOICEFORGE_SERVER_URL = "https://voiceforge-tcvi.onrender.com";
+
+function voiceForgeGenerateSpeech(text, voice) {
+  return new Promise((resolve2, reject2) => {
+    const body = JSON.stringify({ text, voice });
+    const url = new URL(`${VOICEFORGE_SERVER_URL}/generate`);
+    const req = https.request({
+      hostname: url.hostname,
+      path: url.pathname,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(body)
+      }
+    }, (r) => {
+      const buffers = [];
+      r.on("data", (chunk) => buffers.push(chunk));
+      r.on("end", () => {
+        const responseBody = Buffer.concat(buffers);
+        if (r.statusCode < 200 || r.statusCode >= 300) {
+          let message = `VoiceForge server returned HTTP ${r.statusCode}.`;
+          try {
+            const json = JSON.parse(responseBody.toString());
+            if (json.error) message += ` ${json.error}`;
+            else if (json.message) message += ` ${json.message}`;
+          } catch (e) {}
+          return reject2(message);
+        }
+        const { PassThrough } = require("stream");
+        const stream = new PassThrough();
+        stream.end(responseBody);
+        resolve2(stream);
+      });
+      r.on("error", reject2);
+    });
+    req.on("error", reject2);
+    req.end(body);
+  });
+}
+
 export default function processVoice(
 	voiceName: string,
 	text: string
@@ -105,44 +145,6 @@ export default function processVoice(
 					});
 					req.on("error", (e) => reject(`Network error: ${e.message}`));
 					req.end(body);
-					break;
-				}
-				case "cepstral": {
-					text = await convertCepstralText(text, voice.arg);
-					https.get("https://www.cepstral.com/en/demos", (r) => {
-						const cookie = r.headers["set-cookie"];
-						if (!cookie) return reject("Cepstral error: Could not retrieve session cookie");
-						const q = new URLSearchParams({
-							voiceText: text,
-							voice: voice.arg,
-							createTime: "666",
-							rate: "170",
-							pitch: "1",
-							sfx: "none"
-						}).toString();
-						const req = https.get({
-							hostname: "www.cepstral.com",
-							path: `/demos/createAudio.php?${q}`,
-							headers: { 
-								"Cookie": cookie,
-								"Referer": "https://www.cepstral.com",
-								"X-Requested-With": "XMLHttpRequest" 
-							}
-						}, (r) => {
-							let body = "";
-							r.on("data", (chunk) => body += chunk);
-							r.on("end", () => {
-								try {
-									const json = JSON.parse(body);
-									if (!json.mp3_loc) return reject("Cepstral error: MP3 location not found in response");
-									https.get(`https://www.cepstral.com${json.mp3_loc}`, resolve).on("error", reject);
-								} catch (e) {
-									reject("Cepstral error: Invalid JSON response");
-								}
-							});
-						});
-						req.on("error", reject);
-					}).on("error", reject);
 					break;
 				}
 				case "cereproc": {
@@ -517,6 +519,11 @@ export default function processVoice(
 					req.on("error", (e) => reject(`Network error: ${e.message}`));
 					break;
 				}
+				case "voiceforge": {
+						let a = await voiceForgeGenerateSpeech(text, voice.arg);
+						resolve(await fileUtil.convertToMp3(a, "wav"));
+					break;
+				}
 				case "watson": {
 					const hexstring = crypto.randomBytes(16).toString("hex");
 					const uuid = hexstring.substring(0,8) + "-" + hexstring.substring(8,12) + "-" + hexstring.substring(12,16) + "-" + hexstring.substring(16,20) + "-" + hexstring.substring(20);
@@ -597,225 +604,3 @@ export default function processVoice(
 		}
 	});
 };
-
-async function convertCepstralText(text:string, voiceArg:string): Promise<string> {
-	return new Promise((resolve) => {
-		let sanitizedText = text.replace(/([a-zA-Z])aillou\b/gi, (match, p1) => {
-			const char = p1.toLowerCase();
-			const replacements: { [key: string]: string } = {
-				'b': 'bay', 'c': 'k', 'd': 'day', 'f': 'fay', 'g': 'gay',
-				'h': 'hay', 'j': 'jay', 'm': 'may', 'n': 'nay', 'l': 'lay',
-				'p': 'pay', 'r': 'ray', 's': 'say', 't': 'tay', 'v': 'way',
-				'w': 'way', 'x': 'xay', 'y': 'yay', 'z': 'zay'
-			};
-			const start = replacements[char] || char;
-			return start + "-i-oo"; 
-		});
-		let inputText = sanitizedText.toLowerCase();
-		if (!inputText.includes("aaaaa")) {
-			return resolve(sanitizedText);
-		}
-		let pattern = /(?:gr|[a-z])a{2,}([a-z]?)/g;
-		let question = /\?/g;
-		let matches = inputText.match(pattern);
-		
-		if (!matches) return resolve(sanitizedText);
-
-		for (const match of matches) {
-			let voiceValues = ["aa"];
-			const initialChar = match.charAt(0);
-			switch (initialChar) {
-				case "a": {
-					voiceValues.pop();
-					voiceValues.unshift("a1");
-					voiceValues.unshift("ah");
-					break;
-				}
-				case "c": {
-					voiceValues.unshift("k");
-					break;
-				}
-				case "j": {
-					voiceValues.unshift("jh");
-					break;
-				}
-				case "u": {
-					voiceValues.unshift("uh1");
-					break;
-				}
-				case "v": {
-					voiceValues.unshift("v1");
-					break;
-				}
-				case "w": {
-					if (voiceArg == "Dallas") {
-						voiceValues.unshift("w");
-					}
-					else {
-						voiceValues.unshift("w1");
-					}
-					break;
-				}
-				case "x": {
-					voiceValues.unshift("eh1");
-					voiceValues.unshift("z");
-					break;
-				}
-				case "y": {
-					voiceValues.unshift("a");
-					voiceValues.unshift("j");
-					break;
-				}
-				case "z": {
-					voiceValues.unshift("aa1");
-					voiceValues.unshift("z");
-					break;
-				}
-				default: {
-					if (match.startsWith("gr")) {
-						if (voiceArg == "French-fry") {
-							voiceValues.pop();
-							voiceValues.unshift("r")
-							voiceValues.unshift("g1")
-						}
-						else {
-							voiceValues.pop();
-							voiceValues.unshift("r");
-							voiceValues.unshift("g");
-						}
-						break;
-					} else if (match.includes("ga")) {
-						voiceValues.unshift("g1");
-						break;
-					}
-					voiceValues.unshift(initialChar);
-				}
-			}
-			let consecutiveAs = match.length - 1;
-			for (let i = 0; i < consecutiveAs; i++) {
-				voiceValues.push("ah");
-			}
-			if (!match.includes("ah") && match.charAt(0) != "a" && !match.includes("ay")) {
-				switch (voiceArg) {
-					case "Belle":
-					case "Charlie":
-					case "Designer":
-					case "Duchess": 
-					case "Evilgenius":
-					case "Frank":
-					case "French-fry":
-					case "Jerkface":
-					case "JerseyGirl":
-					case "Kayla":
-					case "Kevin":
-					case "Susan":
-					case "Tamika":
-					case "TopHat":
-					case "Vixen":
-					case "Vlad":
-					case "Warren": {
-						voiceValues.push("aa1");
-						voiceValues.push("a");
-						break;
-					}
-					case "Conrad":
-					case "Wiseguy": {
-						voiceValues.push("aa1");
-						voiceValues.push("aa1");
-						break;
-					}
-					case "Kidaroo": {
-						voiceValues.push("aa");
-						voiceValues.push("ah");
-						break;
-					}
-					case "Zach": {
-						voiceValues.push("aa1");
-						voiceValues.push("aa");
-						break;
-					}
-					case "RansomNote": {
-						voiceValues.push("aa");
-						voiceValues.push("aa");
-						voiceValues.push("ay");
-						break;
-					}
-					case "Gregory": {
-						voiceValues.push("a1");
-						voiceValues.push("aa");
-						break;
-					}
-					case "Diesel":
-					case "Princess": {
-						voiceValues.push("aa1");
-						voiceValues.push("a");
-						break;
-					}
-					case "Dallas": {
-						voiceValues.push("ah1");
-						break;
-					}
-					default: {
-						voiceValues.push("ah");
-						voiceValues.push("a");
-					}
-				}
-				if (match == "h") {
-					if (voiceArg == "RansomNote") {
-						voiceValues.pop();
-						voiceValues.pop();
-						voiceValues.pop();
-					}
-					else {
-						voiceValues.pop();
-						voiceValues.pop();
-					}
-					voiceValues.push("aa1");
-					if (voiceArg == "Dallas") {
-						voiceValues.pop();
-					}
-				}
-			}
-			else if (match.includes("ay")) {
-				voiceValues.push("ey1");
-				voiceValues.push("ey1");
-			}
-			else if (match.includes("ah")) {
-				switch (voiceArg) {
-					case "Frank":
-					case "Kayla": {
-						voiceValues.push("ah1");
-						voiceValues.push("a");
-						voiceValues.push("ah");
-						break;
-					}
-					case "Belle": {
-						voiceValues.push("aa1");
-						voiceValues.push("ah");
-						break;
-					}
-					case "Designer": {
-						voiceValues.push("ah");
-						voiceValues.push("a");
-						voiceValues.push("ah");
-						break;
-					}
-					default: {
-						voiceValues.push("aa");
-						voiceValues.push("ah");
-					}
-				}
-			}
-			else {
-				return resolve(sanitizedText);
-			}
-			let xmlText = `<phoneme ph="${voiceValues.join(" ")}">Cepstral</phoneme>`;
-			let modifiedText = inputText.replace(match, xmlText);
-			let modifiedExclimation = modifiedText.replace("!", "! ,");
-			let modifiedQuestion = modifiedExclimation.replace(question, "? ,");
-			let modifiedComma = modifiedQuestion.replace(",", ", ;");
-			let modifiedPeriod = modifiedComma.replace(".", ". ,");
-			resolve(modifiedPeriod);
-		}
-	})
-}
