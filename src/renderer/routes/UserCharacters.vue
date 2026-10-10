@@ -1,15 +1,14 @@
 <style>
+#cc_object[src*="cc.swf"], 
 #cc_object[src*="cc_browser.swf"] {
-	display: block;
+	position: fixed;
+	top: 40px;
+	left: 240px;
+	right: 0;
+	bottom: 0;
+	max-height: calc(100vh - 60px);
 	margin: auto;
-	width: 980px;
-	height: 1200px;
-}
-#cc_object[src*="cc.swf"] {
-	display: block;
-	margin: auto;
-	width: 980px;
-	height: 600px;
+	padding: 0;
 }
 </style>
 
