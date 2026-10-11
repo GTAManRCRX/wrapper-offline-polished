@@ -320,13 +320,7 @@ function setWidth(newWidth:number) {
 	logoCollapsed.value = toValue(width) <= 200;
 }
 function watchWidth() {
-	slideMode.value.margin = Math.min(
-		0,
-		-toValue(width) + Math.max(
-			56,
-			document.body.clientWidth - 1000
-		)
-	);
+  slideMode.value.margin = 0;
 }
 async function charInput_input(e: Event) {
 	const target = e.currentTarget as HTMLInputElement;

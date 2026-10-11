@@ -1,14 +1,19 @@
 <style>
-#cc_object[src*="cc.swf"], 
+#cc_object[src*="cc.swf"],
 #cc_object[src*="cc_browser.swf"] {
 	position: fixed;
 	top: 40px;
-	left: 240px;
-	right: 0;
 	bottom: 0;
-	max-height: calc(100vh - 60px);
-	margin: auto;
+	max-height: calc(100vh - 80px);
+	margin-top: auto;
+	margin-bottom: auto;
 	padding: 0;
+	left: 50%;
+	transform: translateX(-37%) scale(clamp(0.3, (0.001143 * var(--win-w)) - 0.5617, 0.9));
+}
+
+#cc_object[src*="cc_browser.swf"] {
+	height: min(80vh, calc(100vh - 80px));
 }
 </style>
 
@@ -37,6 +42,9 @@ const showDlButton = ref(false);
 const showObject = ref(false);
 const showSelector = ref(false);
 let themeId = "";
+
+const updateVW = () => document.documentElement.style.setProperty('--win-w', window.innerWidth);
+window.addEventListener('resize', updateVW); updateVW();
 
 function initObject(id:string) {
 	themeId = id;
