@@ -60,7 +60,7 @@ onUnmounted(() => {
 				<img src="/img/logo_icon.svg"/>
 				<div>
 					<h1>Wrapper offline</h1>
-					<h3>Version {{ wrapperVer }}</h3>
+					<h3>{{ wrapperVer }}</h3>
 
 					<p>All original code written for Wrapper offline is<br/>
 						distributed under the MIT license</p>
