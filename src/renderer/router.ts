@@ -105,6 +105,9 @@ const router = createRouter({
 	routes,
 });
 router.beforeEach((to) => {
+	if (to.path.startsWith("/movies/play/")) {
+		return;
+	}
 	const title = to.meta.title as string;
 	const titleBase = "Wrapper offline";
 	if (title) {
