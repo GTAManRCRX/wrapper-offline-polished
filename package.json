@@ -1,7 +1,7 @@
 {
 	"name": "wrapper-offline",
 	"description": "GoAnimate server emulator",
-	"version": "2.1.4",
+	"version": "2.1.1",
 	"homepage": "https://discord.gg/Kf7BzSw",
 	"license": "MIT",
 	"private": true,
