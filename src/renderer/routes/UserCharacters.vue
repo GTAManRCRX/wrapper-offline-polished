@@ -2,7 +2,6 @@
 #cc_object[src*="cc.swf"],
 #cc_object[src*="cc_browser.swf"] {
 	position: fixed;
-	display: block;
 	top: 40px;
 	bottom: 0;
 	max-height: calc(100vh - 80px);
