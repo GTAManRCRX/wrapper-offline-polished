@@ -2,14 +2,12 @@
 #full_page_container {
 	background-color: black;
 	padding: 0;
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 }
 #player_object {
-	display: block;
-	margin: auto;
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 }
 #full_page_container.popup_mode {
 	background: radial-gradient(#333, #111);
@@ -42,7 +40,6 @@ let params:Params = {
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
-		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always",
 	allowFullScreen: "true",

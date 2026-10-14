@@ -26,7 +26,6 @@ let params:Params = {
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
-		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always",
 	movie: ""

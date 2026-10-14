@@ -1,19 +1,15 @@
 <style lang="css" scoped>
 #full_page_container {
 	padding: 0;
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 }
 main {
 	display: flex;
-	width: 100%;
-	height: 100%;
 }
 #studio_object {
-	display: block;
-	margin: auto;
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 }
 #full_page_container.popup_mode {
 	background: var(--popup-gradient-bg);
@@ -62,7 +58,6 @@ let params:Params = {
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
-		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always"
 };

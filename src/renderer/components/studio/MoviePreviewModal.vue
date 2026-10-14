@@ -3,8 +3,6 @@
 	background: #0000;
 }
 #player_object {
-	display: block;
-	margin: auto;
 	width: 640px;
 	height: 360px;
 }
@@ -38,7 +36,6 @@ let params:Params = {
 		isPreview: "1",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
-		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always",
 	movie: ""
