@@ -9,7 +9,7 @@
 	margin-bottom: auto;
 	padding: 0;
 	left: 50%;
-	transform: translateX(-37%) scale(clamp(0.3, (0.001143 * var(--win-w)) - 0.5617, 0.9));
+	transform: translateX(-37%) scale(clamp(0.1, (0.001143 * var(--win-w)) - 0.5617, 1));
 }
 #cc_object[src*="cc_browser.swf"] {
 	height: min(80vh, calc(100vh - 80px));
@@ -68,7 +68,6 @@ function initObject(id:string) {
 
 function ccEntered() {
 	navbarEntries.value.push({
-		path: "hope you like it",
 		title: "Creating a character"
 	});
 	showDlButton.value = true;
