@@ -442,7 +442,7 @@ defineExpose({ slideMode, width });
 		width: width + 'px'
 	}">
 		<div id="logo_container" :style="{width:width + 'px'}">
-			<div class="logo_btn" @click="openAppInfo" title="About Wrapper offline">
+			<div class="logo_btn" @click="openAppInfo" title="About the software">
 				<img id="logo_icon" src="/img/logo_icon.svg" alt="Candy"/>
 				<img id="logo_wordmark" src="/img/logo_wordmark.svg" alt="Wrapper offline"/>
 			</div>
