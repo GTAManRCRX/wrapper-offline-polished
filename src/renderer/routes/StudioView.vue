@@ -45,19 +45,11 @@ const showSelector = ref(false);
 let swfUrl:string;
 let params:Params = {
 	flashvars: {
-		appCode: "go",
-		collab: "0",
-		ctc: "go",
-		goteam_draft_only: "1",
-		isLogin: "Y",
-		isWide: "0",
-		lid: "0",
-		page: "",
 		retut: "1",
-		siteId: "go",
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
+		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always"
 };

@@ -29,13 +29,12 @@ const { show = true } = defineProps<{
 let globalXml = "";
 let params:Params = {
 	flashvars: {
-		isEmbed: "1",
 		isInitFromExternal: "1",
-		startFrame: "0",
 		autostart: "1",
 		isPreview: "1",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
+		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always",
 	movie: ""

@@ -16,16 +16,10 @@ const showObject = ref(false);
 let swfUrl:string;
 let params:Params = {
 	flashvars: {
-		appCode: "go",
-		ctc: "go",
-		isEmbed: "1",
-		isLogin: "Y",
-		m_mode: "school",
-		page: "",
-		siteId: "go",
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
+		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always",
 	movie: ""

@@ -25,21 +25,11 @@ import { useRoute } from "vue-router";
 const appSettings = useAppSettings();
 let params:Params = {
 	flashvars: {
-		appCode: "go",
 		autostart: "1",
-		collab: "0",
-		ctc: "go",
-		goteam_draft_only: "1",
-		isLogin: "Y",
-		isWide: "0",
-		lid: "0",
-		nextUrl: "/",
-		page: "",
-		retut: "1",
-		siteId: "go",
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
+		clientThemePath: staticServer + staticPaths.clientUrl + "/<client_theme>"
 	},
 	allowScriptAccess: "always",
 	allowFullScreen: "true",
