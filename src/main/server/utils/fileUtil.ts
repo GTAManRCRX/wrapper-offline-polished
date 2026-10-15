@@ -1,5 +1,5 @@
 import fs from "fs";
-import Ffmpeg from "fluent-ffmpeg";
+import Ffmpeg from "@ts-ffmpeg/fluent-ffmpeg";
 import AdmZip from "adm-zip";
 import type { PassThrough, Readable, Writable } from "stream";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";

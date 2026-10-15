@@ -2,7 +2,7 @@ import type { Asset } from "../models/asset";
 import AssetModel from "../models/asset";
 import { extensions, FileExtension, fromFile, mimeTypes } from "file-type";
 import Directories from "../../storage/directories";
-import Ffmpeg, { FfprobeData, ffprobe } from "fluent-ffmpeg";
+import Ffmpeg, { FfprobeData, ffprobe } from "@ts-ffmpeg/fluent-ffmpeg";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
 import fileTypes from "../data/allowed_file_types.json";

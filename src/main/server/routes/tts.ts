@@ -3,7 +3,7 @@ import Directories from "../../storage/directories";
 import fs from "fs";
 import httpz from "@octanuary/httpz";
 import info from "../data/voices.json";
-import Ffmpeg, { ffprobe, FfprobeData } from "fluent-ffmpeg";
+import Ffmpeg, { ffprobe, FfprobeData } from "@ts-ffmpeg/fluent-ffmpeg";
 import path from "path";
 import processVoice from "../models/tts";
 import { randomBytes } from "crypto";
