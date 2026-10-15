@@ -9,7 +9,7 @@
 		"postinstall": "node scripts/fixModules.js",
 		"dev": "concurrently \"NODE_OPTIONS='--no-deprecation' node scripts/build.mjs --dev\" \"vite dev\"",
 		"build": "vite build && node scripts/build.mjs",
-		"package": "npx electron-packager dist 'Wrapper offline' --icon=dist/favicon.ico --overwrite"
+		"package": "npx electron-packager dist --icon=dist/favicon.ico --overwrite"
 	},
 	"engines": {
 		"node": ">=16"
