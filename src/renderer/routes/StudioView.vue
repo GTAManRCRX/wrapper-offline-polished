@@ -45,6 +45,7 @@ const showSelector = ref(false);
 let swfUrl:string;
 let params:Params = {
 	flashvars: {
+		lid: "0",
 		retut: "1",
 		ut: "60",
 		apiserver: apiServer + "/",

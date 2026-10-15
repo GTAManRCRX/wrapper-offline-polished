@@ -26,6 +26,7 @@ const appSettings = useAppSettings();
 let params:Params = {
 	flashvars: {
 		autostart: "1",
+		lid: "0",
 		ut: "60",
 		apiserver: apiServer + "/",
 		storePath: staticServer + staticPaths.storeUrl + "/<store>",
