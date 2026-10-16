@@ -35,10 +35,13 @@ group.route("GET", "/api/movie/get_info", (req, res) => {
 	}
 	const movie = Database.get("movies", id);
 	if (movie) {
-		res.json(movie.data);
-	} else {
-		res.status(404).json({ msg: "Movie not found" });
+		return res.json(movie.data);
 	}
+	const starters = Database.select("assets", { id, type: "movie" });
+	if (starters.length > 0) {
+		return res.json(starters[0]);
+	}
+	res.status(404).json({ msg: "Movie not found" });
 });
 group.route("GET", "/api/movie/list", (req, res) => {
 	const type = req.query.type;
