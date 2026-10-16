@@ -19,7 +19,6 @@
 		"@ffprobe-installer/ffprobe": "2.1.2",
 		"@ts-ffmpeg/fluent-ffmpeg": "2.2.6",
 		"@octanuary/httpz": "2.0.9",
-		"file-type": "16.5.4",
 		"fflate": "0.8.3",
 		"formidable": "2.0.1",
 		"modern-normalize": "3.0.1",
