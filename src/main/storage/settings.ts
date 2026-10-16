@@ -9,7 +9,6 @@ class Settings {
 		SHOW_WAVEFORMS: true,
 		IS_WIDE: "1",
 		SAVE_LOG_FILES: false,
-		HIDE_NAVBAR: true,
 		DEFAULT_WATERMARK: "none",
 	};
 	private static _instance:Settings;
@@ -58,7 +57,6 @@ class Settings {
 			showWaveforms: this.showWaveforms,
 			isWide: this.isWide,
 			saveLogFiles: this.saveLogFiles,
-			hideNavbar: this.hideNavbar,
 			defaultWatermark: this.defaultWatermark
 		};
 	}
@@ -89,13 +87,6 @@ class Settings {
 	}
 	set saveLogFiles(newValue:boolean) {
 		this.json["SAVE_LOG_FILES"] = newValue;
-		this.save(this.json);
-	}
-	get hideNavbar() {
-		return this.json["HIDE_NAVBAR"];
-	}
-	set hideNavbar(newValue:boolean) {
-		this.json["HIDE_NAVBAR"] = newValue;
 		this.save(this.json);
 	}
 	get defaultWatermark() {
