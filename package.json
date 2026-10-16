@@ -39,10 +39,10 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/GTAManRCRX/wrapper-offline-fixed.git"
+		"url": "git+https://github.com/GTAManRCRX/wrapper-offline-tub.git"
 	},
 	"author": "GTAManRCR",
 	"bugs": {
-		"url": "https://github.com/GTAManRCRX/wrapper-offline-fixed/issues"
+		"url": "https://github.com/GTAManRCRX/wrapper-offline-tub/issues"
 	}
 }
