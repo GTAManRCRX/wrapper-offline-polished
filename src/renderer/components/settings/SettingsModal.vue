@@ -3,7 +3,6 @@
 	width: 775px;
 	height: 400px;
 }
-
 .tab_selector {
 	display: flex;
 }
@@ -18,21 +17,17 @@
 	display: block;
 	text-align: center;
 }
-
 .tab_selector .tab {
 	width: 550px;
 }
-
 html.dark .btn {
 	backface-visibility: hidden;
 	-webkit-font-smoothing: antialiased;
 	transition: background-color 0s !important, color 0s !important;
 }
-
 html.dark .tab_selector .tab_col {
 	border-color: #2c2b3b;
 }
-
 @media (max-width: 800px) {
 	.popup_container.settings_popup .contents {
 		width: 90vw;
@@ -108,7 +103,6 @@ onUnmounted(() => {
 		<Popup class="settings_popup">
 			<template #small-heading>Wrapper offline</template>
 			<template #large-heading>Software settings</template>
-	
 			<div class="tab_selector">
 				<div class="tab_col">
 					<Button v-for="tab in tabs" :primary="selectedTab == tab.id" @click="switchTab(tab.id)">
@@ -116,27 +110,12 @@ onUnmounted(() => {
 					</Button>
 				</div>
 				<div v-if="selectedTab == 'behavior'" class="tab">
-					<SettingToggle id="onMovieDclick" :options="{
-						play: 'Open video player',
-						edit: 'Open video editor',
-						none: 'Do nothing',
-					}" local>
+					<SettingToggle id="onMovieDclick" :options="{ play: 'Open video player', edit: 'Open video editor', none: 'Do nothing', }" local>
 						<template #title>When double clicking a video</template>
 					</SettingToggle>
-
-					<SettingToggle id="onMovieUpload" :options="{
-						play: 'Open video player',
-						edit: 'Open video editor',
-						none: 'Do nothing',
-					}" local>
+					<SettingToggle id="onMovieUpload" :options="{ play: 'Open video player', edit: 'Open video editor', none: 'Do nothing', }" local>
 						<template #title>After uploading a video</template>
 					</SettingToggle>
-
-					<SettingToggle id="hideNavbar" binary>
-						<template #title>Auto-hide navbar</template>
-						<template #description><i>You must restart the program for this change to take effect</i></template>
-					</SettingToggle>
-
 					<SettingToggle id="saveLogFiles" binary>
 						<template #title>Save log files</template>
 						<template #description>Saves everything in the console to the LOGS folder. This may take up a lot of space if left on<br/>
@@ -148,22 +127,16 @@ onUnmounted(() => {
 						<template #title>Dark mode</template>
 						<template #description><i>Does not apply in the video editor or the character creator</i></template>
 					</SettingToggle>
-
-					<SettingToggle id="isWide" :options="{
-						false: '14:9',
-						true: '16:9'
-					}">
+					<SettingToggle id="isWide" :options="{ false: '14:9', true: '16:9' }">
 						<template #title>Aspect ratio</template>
 						<template #description>This controls the aspect ratio videos are displayed in</template>
 					</SettingToggle>
-
 					<SettingToggle id="showWaveforms" binary>
 						<template #title>Show waveforms</template>
 						<template #description>By default, waveforms for audio are generated in the video editor<br/>
 							While useful, the editor freezes while it generates, which could be too annoying or slow for some<br/>
 							Turning this off will simply add a repeating pre-made pattern in place of true waveforms</template>
 					</SettingToggle>
-
 					<SettingToggle id="truncatedThemeList" binary>
 						<template #title>Truncated themelist</template>
 						<template #description>Shows a limited selection of themes</template>

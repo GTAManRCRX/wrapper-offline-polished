@@ -14,7 +14,6 @@ header>div {
 	align-items: center;
 	height: 100%;
 }
-
 header .nav_btn {
 	border: 1px solid #0000;
 	color: hsl(211 4% 32% / 1);
@@ -34,7 +33,6 @@ header .nav_btn:hover {
 	transition: none;
 	cursor: pointer;
 }
-
 header .link_container {
 	margin-left: 2px;
 	overflow: hidden;
@@ -51,7 +49,6 @@ header .link_container .link:hover {
 	background: hsl(338deg 37% 83%);
 	transition: none;
 }
-
 header .link_container .parent_link {
 	text-decoration: none;
 	margin: 0 20px 0 0;
@@ -65,12 +62,10 @@ header .link_container .parent_link .caret {
 	margin-left: -16px;
 	left: 24px;
 }
-
 header .link_container .final_link {
 	user-select: none;
 	font-weight: bold;
 }
-
 header .btn {
 	margin: 0;
 }
@@ -86,7 +81,6 @@ header .search_box:focus {
 	border-color: #5589d8;
 	outline: none;
 }
-
 html.dark header {
 	background: hsl(250 9% 13% / 1);
 	border-color: hsl(250 9% 24% / 1);
@@ -124,30 +118,11 @@ export interface NavbarEntry {
 	path: string,
 	title: string,
 };
-
 const emit = defineEmits<{
 	downloadClick: [],
 	newFolderClick: []
 }>();
-defineProps<{
-
-	count?: number,
-
-	entries: NavbarEntry[],
-
-	supported?: {
-
-		download?: boolean,
-
-		newFolder?: boolean,
-
-		search?: boolean,
-
-		viewMode?: boolean,
-
-		zoom?: boolean,
-	}
-}>();
+defineProps<{ count?: number, entries: NavbarEntry[], supported?: { download?: boolean, newFolder?: boolean, search?: boolean, viewMode?: boolean, zoom?: boolean, } }>();
 
 const router = useRouter();
 const { search, viewMode, zoomLevel } = useListStore();
@@ -158,24 +133,19 @@ function backButtonClick() {
 function forwardButtonClick() {
 	router.forward();
 }
-
 function onSearchInput(e:InputEvent) {
 	const target = e.currentTarget as HTMLInputElement;
 	search.set(target.value);
 }
-
 function downloadButton_click() {
 	emit("downloadClick");
 }
-
 function newFolderClick() {
 	emit("newFolderClick");
 }
-
 function changeView(newView:"grid"|"list") {
 	viewMode.set(newView);
 }
-
 function zoomSliderMoved(e:InputEvent) {
 	const target = e.currentTarget as HTMLInputElement;
 	const newVal = target.valueAsNumber;
@@ -202,27 +172,17 @@ function zoomSliderMoved(e:InputEvent) {
 			</div>
 		</div>
 		<div class="head_right">
-			<!-- download button -->
 			<div v-if="supported?.download"
 				class="nav_btn"
 				title="Download"
 				@click="downloadButton_click">
 				<i class="ico download"></i>
 			</div>
-			<!-- new folder button -->
-			<!-- <div v-if="supported?.newFolder"
-				class="nav_btn"
-				title="New folder"
-				@click="newFolderClick">
-				<i class="ico newfolder"></i>
-			</div> -->
-
 			<input v-if="supported?.search"
 				class="search_box"
 				type="text"
 				placeholder="Search"
 				@input="onSearchInput"/>
-			<!-- zoom slider -->
 			<Dropdown v-if="supported?.zoom" align="right">
 				<template #toggle>
 					<div class="nav_btn" title="Adjust zoom level">
@@ -233,7 +193,6 @@ function zoomSliderMoved(e:InputEvent) {
 					<input type="range" min="42" max="70" :value="zoomLevel.get()" @input="zoomSliderMoved"/>
 				</DropdownItem>
 			</Dropdown>
-			<!-- view options -->
 			<div v-if="supported?.viewMode && viewMode.value == 'list'"
 				class="nav_btn"
 				title="Grid view"
