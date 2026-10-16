@@ -1,6 +1,6 @@
 <div class="head" align="center">
   <h1>Wrapper offline</h1>
-  <p><b>This project is not affiliated with or endorsed by GoAnimate Inc. or their product Vyond. Wrapper offline is a decentralized open source initiative developed exclusively for archival purposes. It operates on a non-profit basis and does not accept any form of donations</b></p>
+  <p><b>This project is not affiliated with or endorsed by GoAnimate inc. or their product Vyond. This is a decentralized open source software developed exclusively for archival purposes. It operates on a non-profit basis and does not accept any form of donations</b></p>
   <br/>
 </div>
 
@@ -8,7 +8,7 @@ Wrapper offline is a software designed to provide readily obtainable, irrevocabl
 It achieves this by replicating the original API and asset servers entirely on the computers of the users while providing a simplistic frontend to interact with them
 This project is important for archival purposes, as the ability to use the legacy GoAnimate editor and themes would be far trickier without it
 
-### Wrapper offline 2.1.1 (The ultimate bugfix)  
+### Wrapper offline 2.1.1 - The ultimate bugfix
 This version is a complete overhaul of the original 2.1.0 source code. Over 40+ critical bugs have been fixed, unnecessary dependencies removed, and the core packages swapped for maximum compatibility and portability
 ### Major architectural changes
 - Sharp → FFmpeg migration: Replaced the binary-heavy Sharp with FFmpeg as that is a Wrapper offline dependency anyways. This enables 100% native Windows 7 support without needing VxKex or any kernel extensions
