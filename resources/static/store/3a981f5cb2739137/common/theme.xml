@@ -17700,7 +17700,7 @@
 	<sound id="rockMain.mp3" name="Rock and roll" downloadtype="progressive" subtype="bgmusic" duration="185000" enable="Y" is_premium="N" aid="3408" money="0" sharing="0"/>
 	<sound id="soft.mp3" name="Soft" downloadtype="progressive" subtype="bgmusic" duration="34000" enable="Y" is_premium="N" aid="3409" money="0" sharing="0"/>
 	<sound id="tension builds up.mp3" name="Build up tension" downloadtype="progressive" subtype="bgmusic" duration="59000" enable="Y" is_premium="N" aid="3410" money="0" sharing="0"/>
-	<sound id="laugh_4.mp3" name="Laugh" downloadtype="progressive" subtype="soundeffect" duration="4700" enable="Y" is_premium="N" aid="3411" money="0" sharing="0">
+	<sound id="laugh_4.mp3" name="Laugh" downloadtype="progressive" subtype="soundeffect" duration="4500" enable="Y" is_premium="N" aid="3411" money="0" sharing="0">
 		<tag>Happy</tag>
 		<tag>Human sounds</tag>
 		<tag>Laugh</tag>
@@ -18707,17 +18707,6 @@
 		<tag>Old jazz</tag>
 		<tag>Silent film</tag>
 		<tag>Sunny</tag>
-	</sound>
-	<sound id="Picnic_For_Two.mp3" name="Picnic for two" downloadtype="progressive" subtype="bgmusic" duration="61210" enable="Y" is_premium="N" aid="15169" money="0" sharing="0">
-		<tag>Atmospheric</tag>
-		<tag>Ballad</tag>
-		<tag>Cartoons</tag>
-		<tag>Funny</tag>
-		<tag>Games</tag>
-		<tag>Gentle</tag>
-		<tag>Light</tag>
-		<tag>Orchestral</tag>
-		<tag>Romantic</tag>
 	</sound>
 	<sound id="Romantic_Night_Out.mp3" name="Romantic night out" downloadtype="progressive" subtype="bgmusic" duration="133021" enable="Y" is_premium="N" aid="15170" money="0" sharing="0">
 		<tag>Ballad</tag>
