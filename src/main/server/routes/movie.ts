@@ -2,7 +2,7 @@ import fs from "fs";
 import httpz from "@octanuary/httpz";
 import Database from "../../storage/database";
 import MovieModel, { Movie } from "../models/movie";
-import { unzipSync, zipSync } from "fflate";
+import { zipSync, unzipSync } from "fflate";
 import fileUtil from "../utils/fileUtil";
 
 const group = new httpz.Group();
