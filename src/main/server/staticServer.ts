@@ -4,82 +4,80 @@ import handler from "serve-handler";
 import { IncomingMessage, ServerResponse } from "http";
 import { zipSync } from "fflate";
 import path from "path";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 
-interface CCCharObject {
-	id: number;
-	name: string;
-	category: string;
-}
+interface CCCharObject { id: number; name: string; category: string; }
+
 const STATIC_SERVER_HOST = process.env.STATIC_SERVER_HOST;
 const STATIC_SERVER_PORT = process.env.STATIC_SERVER_PORT;
-const ccCharObject2Xml = (char: CCCharObject, themeId: string) =>
-	`<char id="${char.id}" name="${char.name || "Untitled"}" cc_theme_id="${themeId}" thumbnail_url="${STATIC_SERVER_HOST}:${STATIC_SERVER_PORT}/thumbnails/${char.id}.png" copyable="Y">
-		<tags>${themeId},_free,_cat:${char.category || "Stock characters"}</tags>
-	</char>`;
-const themeZipPattern = /^\/store\/[\da-zA-Z]+\/([\S]+)\/\1.zip$/;
-const themeXmlPattern = /^\/store\/[\da-zA-Z]+\/([\S]+)\/theme.xml$/;
-async function handleStudioTheme(
-	themeId: string,
-	returnZip: boolean,
-	res: ServerResponse
-) {
+
+const themeZipPattern = /^\/store\/[\da-zA-Z]+\/([\S]+)\/\1\.zip$/;
+const themeXmlPattern = /^\/store\/[\da-zA-Z]+\/([\S]+)\/theme\.xml$/;
+let stockCharsIndex: Record<string, CCCharObject[]> | null = null;
+const fixedThemeXmlCache = new Map<string, Buffer>();
+const themeZipCache = new Map<string, Buffer>();
+
+function getStockCharsIndex(): Record<string, CCCharObject[]> {
+	if (!stockCharsIndex) {
+		const filepath = path.join(Directories.static, "characters/index.json");
+		stockCharsIndex = JSON.parse(readFileSync(filepath, "utf-8"));
+	}
+	return stockCharsIndex!;
+}
+function ccCharObject2Xml(char: CCCharObject, themeId: string): string {
+	const name = char.name || "Untitled";
+	const category = char.category || "Stock characters";
+	return ( `<char id="${char.id}" name="${name}" cc_theme_id="${themeId}" ` + `thumbnail_url="${STATIC_SERVER_HOST}:${STATIC_SERVER_PORT}/thumbnails/${char.id}.png" copyable="Y">` + `<tags>${themeId},_free,_cat:${category}</tags></char>` );
+}
+function fixThemeXml(themeId: string, themeXml: Buffer): Buffer {
+	const cached = fixedThemeXmlCache.get(themeId);
+	if (cached) return cached;
+	const marker = 'cc_theme_id="';
+	const start = themeXml.indexOf(marker);
+	if (start === -1) {
+		fixedThemeXmlCache.set(themeId, themeXml);
+		return themeXml;
+	}
+	const ccThemeIdStart = start + marker.length;
+	const ccThemeIdEnd = themeXml.indexOf('"', ccThemeIdStart);
+	const ccThemeId = themeXml.subarray(ccThemeIdStart, ccThemeIdEnd).toString();
+	const stockChars = getStockCharsIndex()[themeId] || [];
+	const charBlock = Buffer.from( stockChars.map((c) => ccCharObject2Xml(c, ccThemeId)).join("") );
+	const endInd = themeXml.indexOf("</theme>");
+	const result = Buffer.concat([ themeXml.subarray(0, endInd), charBlock, Buffer.from("</theme>"), ]);
+	fixedThemeXmlCache.set(themeId, result);
+	return result;
+}
+function handleStudioTheme( themeId: string, returnZip: boolean, res: ServerResponse ) {
 	const filepath = path.join(Directories.store, themeId, "theme.xml");
+	if (!existsSync(filepath)) {
+		res.statusCode = 404;
+		res.end("Theme not found");
+		return;
+	}
 	const themeXml = fixThemeXml(themeId, readFileSync(filepath));
 	if (returnZip) {
-		const files: Record<string, Uint8Array> = {};
-		fileUtil.addToZip(files, "theme.xml", themeXml);
-		const zipped = zipSync(files);
+		let zipped = themeZipCache.get(themeId);
+		if (!zipped) {
+			const files: Record<string, Uint8Array> = {};
+			fileUtil.addToZip(files, "theme.xml", themeXml);
+			zipped = Buffer.from(zipSync(files));
+			themeZipCache.set(themeId, zipped);
+		}
 		res.setHeader("Content-Type", "application/zip");
-		res.end(Buffer.from(zipped));
+		res.end(zipped);
 	} else {
 		res.setHeader("Content-Type", "application/xml");
 		res.end(themeXml);
 	}
 }
-function fixThemeXml(themeId: string, themeXml: Buffer): Buffer {
-	const ccThemeIdStart = themeXml.indexOf('cc_theme_id="') + 13;
-	if (ccThemeIdStart == 12) {
-		return themeXml;
-	}
-	const ccThemeIdEnd = themeXml.indexOf('"', ccThemeIdStart);
-	const ccThemeId = themeXml.subarray(ccThemeIdStart, ccThemeIdEnd).toString();
-
-	const stockChars = readStockCCChars(themeId);
-	const charBlock = Buffer.from(
-		stockChars
-			.map((c) => {
-				return ccCharObject2Xml(c, ccThemeId);
-			})
-			.join("")
-	);
-	const endInd = themeXml.indexOf("</theme>");
-	return Buffer.concat([
-		themeXml.subarray(0, endInd),
-		charBlock,
-		Buffer.from("</theme>"),
-	]);
-}
-function readStockCCChars(themeId: string): CCCharObject[] {
-	const filepath = path.join(Directories.static, "characters/index.json");
-	const contents = readFileSync(filepath, {
-		encoding: "utf-8",
-	});
-	if (contents.indexOf(themeId) == -1) {
-		return [];
-	}
-	const stockChars = JSON.parse(contents);
-	return stockChars[themeId];
-}
-export default async function staticServer(
-	req: IncomingMessage,
-	res: ServerResponse
-) {
-	const themeXmlMatch = req.url.match(themeXmlPattern);
+export default async function staticServer( req: IncomingMessage, res: ServerResponse) {
+	const url = req.url || "";
+	const themeXmlMatch = url.match(themeXmlPattern);
 	if (themeXmlMatch) {
 		return handleStudioTheme(themeXmlMatch[1], false, res);
 	}
-	const themeZipMatch = req.url.match(themeZipPattern);
+	const themeZipMatch = url.match(themeZipPattern);
 	if (themeZipMatch) {
 		return handleStudioTheme(themeZipMatch[1], true, res);
 	}
