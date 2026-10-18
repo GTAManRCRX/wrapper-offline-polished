@@ -17,14 +17,14 @@
 	"dependencies": {
 		"@ffmpeg-installer/ffmpeg": "1.1.0",
 		"@ffprobe-installer/ffprobe": "2.1.2",
+		"@rgrove/parse-xml": "5.0.0",
 		"@ts-ffmpeg/fluent-ffmpeg": "2.2.6",
 		"@octanuary/httpz": "2.0.9",
 		"fflate": "0.8.3",
 		"formidable": "2.0.1",
 		"serve-handler": "6.1.7",
 		"vue": "3.5.44",
-		"vue-router": "5.0.7",
-		"xmldoc": "3.0.0"
+		"vue-router": "5.0.7"
 	},
 	"devDependencies": {
 		"@types/formidable": "3.5.1",
