@@ -75,12 +75,12 @@ group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 		} catch (err) {
 			console.error("TTS post-processing error:", err);
 			if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-			res.end(`1<error><code>ERR_ASSET_500</code><message>Post-processing failed</message></error>`);
+			res.end(`1<error><code>ERR_ASSET_500</code><message>${e}</message></error>`);
 		}
 	} catch (e) {
 		console.error("Error generating TTS:", e);
 		if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-		res.end(`1<error><code>ERR_ASSET_404</code><message>Generation failed</message></error>`);
+		res.end(`1<error><code>ERR_ASSET_404</code><message>${e}</message></error>`);
 	}
 });
 
