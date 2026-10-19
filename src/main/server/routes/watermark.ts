@@ -3,7 +3,7 @@ import Database from "../../storage/database";
 import fileTypes from "../data/allowed_file_types.json";
 import { Group } from "@octanuary/httpz";
 import { Readable } from "stream";
-import { execSync } from "child_process";
+import { exec } from "child_process";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import MovieModel from "../models/movie.js";
 import Settings from "../../storage/settings";
@@ -44,10 +44,7 @@ group.route("POST", "/api/watermark/set_default", (req, res) => {
 	res.log("Default watermark set to " + id);
 });
 group.route("GET", "/api/watermark/list", (req, res) => {
-	const list = WatermarkModel.list().map((w: any) => {
-		w.thumbnail = `${url}/watermarks/${w.id}`;
-		return w;
-	});
+	const list = WatermarkModel.list().map((w: any) => { w.thumbnail = `${url}/watermarks/${w.id}`; return w; });
 	res.json(list);
 });
 group.route("POST", "/goapi/getUserWatermarks/", (req, res) => {
@@ -65,10 +62,7 @@ group.route("POST", "/goapi/getUserWatermarks/", (req, res) => {
 	}
 	const list = WatermarkModel.list();
 	res.setHeader("Content-Type", "application/xml");
-	res.end(`${XML_HEADER}<watermarks>${
-		list.map((w) => `<watermark id="${w.id}" thumbnail="${url}/watermarks/${w.id}"/>`).join("")
-	}${wId !== null ? `<preview>${wId}</preview>` : ""}</watermarks>`);
-});
+	res.end(`${XML_HEADER}<watermarks>${ list.map((w) => `<watermark id="${w.id}" thumbnail="${url}/watermarks/${w.id}"/>`).join("") }${wId !== null ? `<preview>${wId}</preview>` : ""}</watermarks>`); });
 group.route("GET", /^\/watermarks\/([\S]*)$/, (req, res) => {
 	const id = req.matches[1];
 	if (!id) {
@@ -76,14 +70,7 @@ group.route("GET", /^\/watermarks\/([\S]*)$/, (req, res) => {
 	}
 	try {
 		const ext = path.extname(id).toLowerCase() || ".png";
-		const mimeTypes: Record<string, string> = {
-			".png": "image/png",
-			".jpg": "image/jpeg",
-			".jpeg": "image/jpeg",
-			".gif": "image/gif",
-			".webp": "image/webp",
-			".swf": "application/x-shockwave-flash"
-		};
+		const mimeTypes: Record<string, string> = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp", ".swf": "application/x-shockwave-flash" };
 		const mime = mimeTypes[ext] || "application/octet-stream";
 		const readStream = WatermarkModel.load(id);
 		res.setHeader("Content-Type", mime);
@@ -104,14 +91,7 @@ group.route("POST", "/goapi/getMovieInfo/", (req, res) => {
 	}
 	const wId = movie.data.watermark;
 	res.setHeader("Content-Type", "application/xml");
-	res.end(`${XML_HEADER}<watermarks>${
-		(typeof wId == "undefined" || wId == "none")
-			? `<watermark style=""/>`
-			: (wId == "0vTLbQy9hG7k")
-				? ""
-				: `<watermark>${url}/watermarks/${wId}</watermark>`
-	}</watermarks>`);
-});
+	res.end(`${XML_HEADER}<watermarks>${ (typeof wId == "undefined" || wId == "none") ? `<watermark style=""/>` : (wId == "0vTLbQy9hG7k") ? "" : `<watermark>${url}/watermarks/${wId}</watermark>` }</watermarks>`); });
 group.route("POST", "/api/watermark/save", async (req, res) => {
 	if (WatermarkModel.list().length >= 20) {
 		return res.status(400).json({ msg: "Maximum number of watermarks reached" });
@@ -135,7 +115,12 @@ group.route("POST", "/api/watermark/save", async (req, res) => {
 	let finalExt = ext;
 	if (["webp", "tif", "tiff", "avif"].includes(ext)) {
 		try {
-			const buffer = execSync(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -f image2pipe -vcodec png -`);
+			const buffer = await new Promise<Buffer>((resolve, reject) => {
+				exec(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -f image2pipe -vcodec png -`, { encoding: "buffer" as any }, (err, stdout) => {
+					if (err) return reject(err);
+					resolve(stdout);
+				});
+			});
 			stream = Readable.from(buffer);
 			finalExt = "png";
 		} catch (err) {

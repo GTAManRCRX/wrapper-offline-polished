@@ -7,14 +7,13 @@ import path from "path";
 import processVoice from "../models/tts";
 import { randomBytes } from "crypto";
 import { Readable } from "stream";
-import { execSync } from "child_process";
+import { exec } from "child_process";
 import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
 
 const group = new httpz.Group();
 const voices = info.voices, langs = {};
 
-Object.keys(voices).forEach((i) => {
-	const v = voices[i], l = v.language; langs[l] = langs[l] || []; langs[l].push(`<voice id="${i}" desc="${v.desc}" sex="${v.gender}" demo-url="" country="${v.country}" plus="N"/>`); });
+Object.keys(voices).forEach((i) => { const v = voices[i], l = v.language; langs[l] = langs[l] || []; langs[l].push(`<voice id="${i}" desc="${v.desc}" sex="${v.gender}" demo-url="" country="${v.country}" plus="N"/>`); });
 const xml = `${process.env.XML_HEADER}<voices>${ Object.keys(langs).sort().map(i => { const v = langs[i], l = info.languages[i]; return `<language id="${i}" desc="${l}">${v.join("")}</language>`; }).join("")}</voices>`;
 group.route("POST", "/goapi/getTextToSpeechVoices/", (req, res) => { res.setHeader("Content-Type", "text/html; charset=UTF-8"); res.end(xml); });
 group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
@@ -39,8 +38,12 @@ group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 			});
 		});
 		try {
-			const ffprobeRaw = execSync(`"${ffprobePath}" -v error -show_entries format=duration -of json "${filepath}"`);
-			const ffdata = JSON.parse(ffprobeRaw.toString());
+			const ffprobeRaw = await new Promise<string>((resolve, reject) => { exec(`"${ffprobePath}" -v error -show_entries format=duration -of json "${filepath}"`, (error, stdout) => {
+				if (error) return reject(error);
+				resolve(stdout.toString());
+			});
+		});
+			const ffdata = JSON.parse(ffprobeRaw);
 			const duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
 			const meta: Partial<Asset> = { duration, type: "sound", subtype: "tts", title: `[${voices[voice].desc}] ${text}` };
 			const id = await AssetModel.save(filepath, "mp3", meta);
