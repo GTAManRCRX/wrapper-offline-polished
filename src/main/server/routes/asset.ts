@@ -231,7 +231,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 					info.height = ffdata.streams?.[0]?.height || (ffdata.streams?.[1] ? ffdata.streams[1].height : 0);					
 					const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.flv`);
 					try {
-						execSync(`"${ffmpegPath}" -hide_banner -loglevel error -y -i "${filepath}" "${temppath}"`);
+						execSync(`"${ffmpegPath}" -hide_banner -loglevel error -y -i "${filepath}" -q:v 2 "${temppath}"`);
 					} catch (err) {
 						console.error("FFmpeg video conversion error:", err);
 						return res.status(500).json({ msg: "Video processing failed" });
