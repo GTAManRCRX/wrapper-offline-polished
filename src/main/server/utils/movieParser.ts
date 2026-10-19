@@ -6,24 +6,61 @@ import Directories from "../../storage/directories";
 import fs from "fs";
 import path from "path";
 import { zipSync, unzipSync } from "fflate";
-import { parseXml } from "@rgrove/parse-xml";
 
 const source = path.join(Directories.static, process.env.CLIENT_URL);
 const store = path.join(Directories.static, process.env.STORE_URL);
 const header = process.env.XML_HEADER;
 
-type XmlNode = {
-	type: string;
-	name?: string;
-	attributes?: Record<string, string>;
-	children?: XmlNode[];
-	text?: string;
-};
+type XmlNode = { type: "element" | "text" | "cdata" | "document"; name?: string; attributes?: Record<string, string>; children?: XmlNode[]; text?: string; };
+
+function parseXml(str: string): XmlNode {
+	const root: XmlNode = { type: "document", children: [] };
+	const stack: XmlNode[] = [root];
+	const tagRe = /<\/?([A-Za-z0-9:_-]+)([^>]*)>|<!\[CDATA\[(.*?)\]\]>|([^<]+)/gs;
+	for (const match of str.matchAll(tagRe)) {
+		if (match[0].startsWith("<![CDATA[")) {
+			const node: XmlNode = { type: "cdata", text: match[3] };
+			const parent = stack[stack.length - 1]; (parent.children ??= []).push(node);
+			continue;
+		}
+		if (match[4] !== undefined) {
+			const txt = match[4].trim();
+			if (txt) {
+				const node: XmlNode = { type: "text", text: txt };
+				const parent = stack[stack.length - 1]; (parent.children ??= []).push(node);
+			}
+			continue;
+		}
+		const isEnd = match[0].startsWith("</");
+		const tagName = match[1];
+		const attrStr = match[2] ?? "";
+		if (isEnd) {
+			const popped = stack.pop();
+			if (!popped || popped.name !== tagName) {
+				throw new Error(`Mismatched closing tag: </${tagName}>`);
+			}
+			continue;
+		}
+		const selfClosing = /\/\s*>$/.test(match[0]);
+		const attrs: Record<string, string> = {};
+		const attrRe = /([A-Za-z0-9:_-]+)\s*=\s*"([^"]*)"/g;
+		for (const a of attrStr.matchAll(attrRe)) {
+			attrs[a[1]] = a[2];
+		}
+		const node: XmlNode = { type: "element", name: tagName, attributes: Object.keys(attrs).length ? attrs : undefined, children: [], };
+		const parent = stack[stack.length - 1]; (parent.children ??= []).push(node);
+		if (!selfClosing) {
+			stack.push(node);
+		}
+	}
+	if (stack.length !== 1) {
+		throw new Error("Unbalanced XML tags");
+	}
+	return root;
+}
 function elements(node: XmlNode | undefined, name?: string): XmlNode[] {
 	if (!node?.children) return [];
-	return node.children.filter(
-		(c) => c.type === "element" && (name == null || c.name === name)
-	);
+	return node.children.filter( (c) => c.type === "element" && (name == null || c.name === name) );
 }
 function child(node: XmlNode | undefined, name: string): XmlNode | undefined {
 	return elements(node, name)[0];
@@ -35,20 +72,15 @@ function childText(node: XmlNode | undefined, name: string): string | undefined 
 	return t?.text;
 }
 function attr(node: XmlNode | undefined, name: string): string | undefined { return node?.attributes?.[name]; }
-function clearElement(node: XmlNode) {
-	node.name = "ELEMENT";
-	node.attributes = {};
-	node.children = [];
-}
-function escapeXml(s: string): string { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-
+function clearElement(node: XmlNode) { node.name = "ELEMENT"; node.attributes = {}; node.children = []; }
+function escapeXml(s: string): string { return s .replace(/&/g, "&amp;") .replace(/</g, "&lt;") .replace(/>/g, "&gt;") .replace(/"/g, "&quot;"); }
 function serialize(node: XmlNode): string {
 	if (node.type === "text" || node.type === "cdata") {
 		return escapeXml(node.text || "");
 	}
 	if (node.type !== "element" || !node.name) return "";
 	const attrs = node.attributes ? Object.entries(node.attributes) .map(([k, v]) => ` ${k}="${escapeXml(v)}"`) .join("") : "";
-	const inner = (node.children || []).map(serialize).join("");
+	const inner = (node.children ?? []).map(serialize).join("");
 	if (!inner) return `<${node.name}${attrs}/>`;
 	return `<${node.name}${attrs}>${inner}</${node.name}>`;
 }
@@ -119,22 +151,15 @@ export default {
 		async function basicParse(file: string, type: string, subtype?: string) {
 			const pieces = file.split(".");
 			const themeId = pieces[0];
-			const ext = pieces.pop();
-			pieces[pieces.length - 1] += "." + ext;
-			pieces.splice(1, 0, type);
+			const ext = pieces.pop()!; pieces[pieces.length - 1] += "." + ext; pieces.splice(1, 0, type);
 			const filename = pieces.join(".");
 			let buffer: Buffer;
 			try {
 				if (themeId === "ugc") {
-					const id = pieces[2];
-					buffer = AssetModel.load(id, true);
+					const id = pieces[2]; buffer = AssetModel.load(id, true);
 					const assetMeta = database.get("assets", id);
-					if (!assetMeta) {
-						throw new Error(`Asset #${id} is in the XML`);
-					}
-					ugc += AssetModel.meta2Xml(assetMeta.data);
-					if (type === "prop" && subtype === "video") {
-						pieces[2] = pieces[2].slice(0, -3) + "png";
+					if (!assetMeta) throw new Error(`Asset #${id} is in the XML`); ugc += AssetModel.meta2Xml(assetMeta.data);
+					if (type === "prop" && subtype === "video") { pieces[2] = pieces[2].slice(0, -3) + "png";
 						const thumbFilename = pieces.join(".");
 						const thumbBuf = AssetModel.load(pieces[2], true);
 						files[thumbFilename] = toU8(thumbBuf);
@@ -190,7 +215,7 @@ export default {
 						if (!file) continue;
 						const pieces = file.split(".");
 						const themeId = pieces[0];
-						const ext = pieces.pop();
+						const ext = pieces.pop()!;
 						pieces[pieces.length - 1] += "." + ext;
 						pieces.splice(1, 0, "char");
 						if (themeId === "ugc") {
@@ -199,11 +224,7 @@ export default {
 							try {
 								const charXml = CharModel.charXml(id);
 								const filename = pieces.join(".");
-								ugc += AssetModel.meta2Xml({
-									id,
-									type: "char",
-									themeId: CharModel.getThemeId(charXml),
-								} as Char);
+								ugc += AssetModel.meta2Xml({ id, type: "char", themeId: CharModel.getThemeId(charXml), } as Char);
 								files[filename + ".xml"] = toU8(charXml);
 							} catch {
 								clearElement(elem2);
@@ -255,8 +276,7 @@ export default {
 						const font = attr(text, "font");
 						if (!font || font === "Arial") continue;
 						const filename = `${fontId2File(font)}.swf`;
-						const filepath = `${source}/go/font/${filename}`;
-						files[filename] = toU8(fs.readFileSync(filepath));
+						const filepath = `${source}/go/font/${filename}`; files[filename] = toU8(fs.readFileSync(filepath));
 						break;
 					}
 				}
@@ -270,24 +290,17 @@ export default {
 			delete themes.cc2;
 			themes.action = true;
 		}
-		const themeKs = Object.keys(themes);
-		for (const themeId of themeKs) {
+		const themeIds = Object.keys(themes);
+		for (const themeId of themeIds) {
 			if (themeId === "ugc") continue;
-			const xmlPath = `${store}/${themeId}/theme.xml`;
-			files[`${themeId}.xml`] = toU8(fs.readFileSync(xmlPath));
+			const xmlPath = `${store}/${themeId}/theme.xml`; files[`${themeId}.xml`] = toU8(fs.readFileSync(xmlPath));
 		}
 		files["themelist.xml"] = toU8(
-			Buffer.from(
-				`${header}<themes>${themeKs.map((t) => `<theme>${t}</theme>`).join("")}</themes>`
-			)
+			Buffer.from( `${header}<themes>${themeIds .map((t) => `<theme>${t}</theme>`) .join("")}</themes>` )
 		);
 		files["ugc.xml"] = toU8(Buffer.from(ugc + "</theme>"));
-		if (thumbBuffer) {
-			files["thumbnail.png"] = toU8(thumbBuffer);
-		}
-		if (changesMade) {
-			xmlBuffer = Buffer.from(serializeDocument(doc));
-		}
+		if (thumbBuffer) files["thumbnail.png"] = toU8(thumbBuffer);
+		if (changesMade) xmlBuffer = Buffer.from(serializeDocument(doc));
 		files["movie.xml"] = toU8(xmlBuffer);
 		return Buffer.from(zipSync(files));
 	},
@@ -298,29 +311,11 @@ export default {
 		return audios.map((v) => {
 			const pieces = childText(v, "sfile")!.split(".");
 			const themeId = pieces[0];
-			const ext = pieces.pop();
-			pieces[pieces.length - 1] += "." + ext;
-			pieces.splice(1, 0, "sound");
-			let filepath: string;
-			if (themeId === "ugc") { filepath = path.join(AssetModel.folder, pieces[pieces.length - 1]); } 
-			else { filepath = path.join(store, pieces.join("/")); }
+			const ext = pieces.pop()!; pieces[pieces.length - 1] += "." + ext; pieces.splice(1, 0, "sound");
+			const filepath = themeId === "ugc" ? path.join(AssetModel.folder, pieces[pieces.length - 1]) : path.join(store, pieces.join("/"));
 			const fadein = child(v, "fadein");
 			const fadeout = child(v, "fadeout");
-			return {
-				filepath,
-				start: +childText(v, "start")!,
-				stop: +childText(v, "stop")!,
-				trimStart: +(childText(v, "trimStart") || 0),
-				trimEnd: +(childText(v, "trimEnd") || 0),
-				fadeIn: {
-					duration: +attr(fadein, "duration")!,
-					vol: +attr(fadein, "vol")!,
-				},
-				fadeOut: {
-					duration: +attr(fadeout, "duration")!,
-					vol: +attr(fadeout, "vol")!,
-				},
-			};
+			return { filepath, start: +childText(v, "start")!, stop: +childText(v, "stop")!, trimStart: +(childText(v, "trimStart") || 0), trimEnd: +(childText(v, "trimEnd") || 0), fadeIn: { duration: +attr(fadein, "duration")!, vol: +attr(fadein, "vol")!, }, fadeOut: { duration: +attr(fadeout, "duration")!, vol: +attr(fadeout, "vol")!, }, };
 		});
 	},
 	async unpack(body: Buffer): Promise<[Buffer, Buffer]> {
@@ -333,13 +328,7 @@ export default {
 			const id = attr(elem, "id")!;
 			if (!AssetModel.exists(id)) {
 				const buffer = zipFiles[`ugc.bg.${id}`];
-				if (buffer) {
-					AssetModel.save(Buffer.from(buffer), id, {
-						type: "bg",
-						subtype: "0",
-						title: attr(elem, "name"),
-						id,
-					});
+				if (buffer) { AssetModel.save(Buffer.from(buffer), id, { type: "bg", subtype: "0", title: attr(elem, "name"), id, });
 				}
 			}
 		}
@@ -348,36 +337,14 @@ export default {
 			if (!AssetModel.exists(id)) {
 				const buffer = zipFiles[`ugc.prop.${id}`];
 				if (buffer) {
-					if (attr(elem, "subtype") === "video") {
-						AssetModel.save(Buffer.from(buffer), id, {
-							type: "prop",
-							subtype: "video",
-							title: attr(elem, "name"),
-							width: +attr(elem, "width")!,
-							height: +attr(elem, "height")!,
-							id,
-						} as Asset);
+					if (attr(elem, "subtype") === "video") { AssetModel.save(Buffer.from(buffer), id, { type: "prop", subtype: "video", title: attr(elem, "name"), width: +attr(elem, "width")!, height: +attr(elem, "height")!, id, } as Asset);
 						const thumbName = `ugc.prop.${id.slice(0, -4)}.png`;
 						const buffer2 = zipFiles[thumbName];
 						if (buffer2) {
-							fs.writeFileSync(
-								path.join(AssetModel.folder, id.slice(0, -4) + ".png"),
-								Buffer.from(buffer2)
-							);
+							fs.writeFileSync( path.join(AssetModel.folder, id.slice(0, -4) + ".png"), Buffer.from(buffer2) );
 						}
 					} else {
-						AssetModel.save(Buffer.from(buffer), id, {
-							type: "prop",
-							subtype: "0",
-							title: attr(elem, "name"),
-							ptype:
-								attr(elem, "wearable") === "1"
-									? "wearable"
-									: attr(elem, "holdable") === "1"
-									? "holdable"
-									: "placeable",
-							id,
-						});
+						AssetModel.save(Buffer.from(buffer), id, { type: "prop", subtype: "0", title: attr(elem, "name"), ptype: attr(elem, "wearable") === "1" ? "wearable" : attr(elem, "holdable") === "1" ? "holdable" : "placeable", id, });
 					}
 				}
 			}
@@ -387,38 +354,18 @@ export default {
 			if (!CharModel.exists(id)) {
 				const buffer = zipFiles[`ugc.char.${id}.xml`];
 				if (buffer) {
-					CharModel.save(Buffer.from(buffer), {
-						type: "char",
-						subtype: "0",
-						title: attr(elem, "name"),
-						themeId: CharModel.getThemeId(Buffer.from(buffer)),
-						id,
-					});
+					CharModel.save(Buffer.from(buffer), { type: "char", subtype: "0", title: attr(elem, "name"), themeId: CharModel.getThemeId(Buffer.from(buffer)), id, });
 				}
 			}
 		}
 		for (const elem of elements(ugc, "sound")) {
 			const subtype = attr(elem, "subtype");
-			switch (subtype) {
-				case "bgmusic":
-				case "soundeffect":
-				case "voiceover":
-				case "tts":
-					break;
-				default:
-					continue;
-			}
+			if (!["bgmusic", "soundeffect", "voiceover", "tts"].includes(subtype || ""))
+				continue;
 			const id = attr(elem, "id")!;
 			if (!AssetModel.exists(id)) {
 				const buffer = zipFiles[`ugc.sound.${id}`];
-				if (buffer) {
-					AssetModel.save(Buffer.from(buffer), id, {
-						duration: +attr(elem, "duration")!,
-						type: "sound",
-						subtype,
-						title: attr(elem, "name"),
-						id,
-					});
+				if (buffer) { AssetModel.save(Buffer.from(buffer), id, { duration: +attr(elem, "duration")!, type: "sound", subtype, title: attr(elem, "name"), id, });
 				}
 			}
 		}

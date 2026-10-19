@@ -17,7 +17,6 @@
 	"dependencies": {
 		"@ffmpeg-installer/ffmpeg": "1.1.0",
 		"@ffprobe-installer/ffprobe": "2.1.2",
-		"@rgrove/parse-xml": "5.0.0",
 		"@ts-ffmpeg/fluent-ffmpeg": "2.2.6",
 		"@octanuary/httpz": "2.0.9",
 		"fflate": "0.8.3",
