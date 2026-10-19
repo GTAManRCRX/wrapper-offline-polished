@@ -3,30 +3,20 @@ import Directories from "../../storage/directories";
 import fs from "fs";
 import httpz from "@octanuary/httpz";
 import info from "../data/voices.json";
-import Ffmpeg, { ffprobe, FfprobeData } from "@ts-ffmpeg/fluent-ffmpeg";
 import path from "path";
 import processVoice from "../models/tts";
 import { randomBytes } from "crypto";
 import { Readable } from "stream";
-import { promisify } from "util";
+import { execSync } from "child_process";
+import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
 
 const group = new httpz.Group();
-const asyncFfprobe = promisify(ffprobe);
 const voices = info.voices, langs = {};
+
 Object.keys(voices).forEach((i) => {
-	const v = voices[i], l = v.language;
-	langs[l] = langs[l] || [];
-	langs[l].push(`<voice id="${i}" desc="${v.desc}" sex="${v.gender}" demo-url="" country="${v.country}" plus="N"/>`);
-});
-const xml = `${process.env.XML_HEADER}<voices>${
-	Object.keys(langs).sort().map(i => {
-		const v = langs[i], l = info.languages[i];
-		return `<language id="${i}" desc="${l}">${v.join("")}</language>`;
-	}).join("")}</voices>`;
-group.route("POST", "/goapi/getTextToSpeechVoices/", (req, res) => {
-	res.setHeader("Content-Type", "text/html; charset=UTF-8");
-	res.end(xml);
-});
+	const v = voices[i], l = v.language; langs[l] = langs[l] || []; langs[l].push(`<voice id="${i}" desc="${v.desc}" sex="${v.gender}" demo-url="" country="${v.country}" plus="N"/>`); });
+const xml = `${process.env.XML_HEADER}<voices>${ Object.keys(langs).sort().map(i => { const v = langs[i], l = info.languages[i]; return `<language id="${i}" desc="${l}">${v.join("")}</language>`; }).join("")}</voices>`;
+group.route("POST", "/goapi/getTextToSpeechVoices/", (req, res) => { res.setHeader("Content-Type", "text/html; charset=UTF-8"); res.end(xml); });
 group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 	const { voice, text: rawText } = req.body;
 	if (!voice || !rawText) {
@@ -49,16 +39,11 @@ group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 			});
 		});
 		try {
-			const ffdata = await asyncFfprobe(filepath) as FfprobeData;
-			const duration = Math.floor(ffdata.format.duration * 1e3);
-			const meta: Partial<Asset> = {
-				duration,
-				type: "sound",
-				subtype: "tts",
-				title: `[${voices[voice].desc}] ${text}`
-			};
+			const ffprobeRaw = execSync(`"${ffprobePath}" -v error -show_entries format=duration -of json "${filepath}"`);
+			const ffdata = JSON.parse(ffprobeRaw.toString());
+			const duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
+			const meta: Partial<Asset> = { duration, type: "sound", subtype: "tts", title: `[${voices[voice].desc}] ${text}` };
 			const id = await AssetModel.save(filepath, "mp3", meta);
-			
 			setTimeout(() => {
 				if (fs.existsSync(filepath)) {
 					fs.unlinkSync(filepath);
@@ -75,7 +60,7 @@ group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 		} catch (err) {
 			console.error("TTS post-processing error:", err);
 			if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-			res.end(`1<error><code>ERR_ASSET_500</code><message>${e}</message></error>`);
+			res.end(`1<error><code>ERR_ASSET_500</code><message>${err}</message></error>`);
 		}
 	} catch (e) {
 		console.error("Error generating TTS:", e);

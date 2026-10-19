@@ -1,26 +1,24 @@
 import type { Asset } from "../models/asset";
 import AssetModel from "../models/asset";
 import Directories from "../../storage/directories";
-import Ffmpeg, { FfprobeData, ffprobe } from "@ts-ffmpeg/fluent-ffmpeg";
-import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
-import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
 import fileTypes from "../data/allowed_file_types.json";
 import fileUtil from "../utils/fileUtil";
 import fs from "fs";
 import httpz from "@octanuary/httpz";
 import MovieModel from "../models/movie";
 import path from "path";
-import { promisify } from "util";
 import { randomBytes } from "crypto";
 import { Readable } from "stream";
 import { execSync } from "child_process";
-
-const asyncFfprobe = promisify(ffprobe);
-
-Ffmpeg.setFfmpegPath(ffmpegPath);
-Ffmpeg.setFfprobePath(ffprobePath);
+import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
+import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
 
 const group = new httpz.Group();
+
+function getMediaInfo(filepath: string): any {
+	const rawJson = execSync(`"${ffprobePath}" -v error -show_entries format=duration -show_entries stream=width,height -of json "${filepath}"`);
+	return JSON.parse(rawJson.toString());
+}
 group.route("POST", "/api_v2/asset/delete/", async (req, res) => {
 	const idField = req.body.data?.id || req.body.data?.starter_id;
 	if (typeof idField == "undefined") {
@@ -49,9 +47,7 @@ group.route("POST", "/api_v2/asset/delete/", async (req, res) => {
 	res.json({ status: "ok" });
 });
 group.route("GET", "/api/asset/list", (req, res) => {
-	const filter = {
-		type: ["bg", "prop", "sound"] as any as Asset["type"]
-	};
+	const filter = { type: ["bg", "prop", "sound"] as any as Asset["type"] };
 	const list = AssetModel.list(filter, false) || [];
 	res.json(list);
 });
@@ -62,15 +58,9 @@ group.route("POST", "/api_v2/assets/imported", (req, res) => {
 	if (req.body.data.type == "prop") {
 		req.body.data.subtype ||= "0";
 	}
-	const filters: Partial<Asset> = {
-		type: req.body.data.type
-	};
+	const filters: Partial<Asset> = { type: req.body.data.type };
 	if (req.body.data.subtype) filters.subtype = req.body.data.subtype;
-	res.json({
-		status: "ok",
-		data: {
-			xml: AssetModel.list(filters, true)
-		}
+	res.json({ status: "ok", data: { xml: AssetModel.list(filters, true) }
 	});
 });
 group.route("POST", "/goapi/getUserAssetsXml/", (req, res) => {
@@ -94,10 +84,7 @@ group.route("POST", "/goapi/getUserAssetsXml/", (req, res) => {
 		default:
 			themeId = req.body.themeId;
 	}
-	const filters: Partial<Asset> = {
-		themeId,
-		type: "char"
-	};
+	const filters: Partial<Asset> = { themeId, type: "char" };
 	if (req.body.assetId && req.body.assetId !== "null") filters.id = req.body.assetId;
 	res.setHeader("Content-Type", "application/xml");
 	res.end(AssetModel.list(filters, true));
@@ -132,14 +119,9 @@ group.route("POST", "/api_v2/asset/get", (req, res) => {
 	}
 	try {
 		const info = AssetModel.getInfo(id);
-		const extraInfo = {
-			share: { type: "none" },
-			published: ""
+		const extraInfo = { share: { type: "none" }, published: ""
 		};
-		res.json({
-			status: "ok",
-			data: Object.assign(info, extraInfo),
-		});
+		res.json({ status: "ok", data: Object.assign(info, extraInfo), });
 	} catch (e) {
 		if (e == "404") {
 			return res.status(404).json({ status: "error" });
@@ -149,10 +131,7 @@ group.route("POST", "/api_v2/asset/get", (req, res) => {
 	}
 });
 group.route("POST", "/goapi/getAssetTags/", (_, r) => r.json([]));
-group.route("POST", "/goapi/getLatestAssetId/", (_, r) => {
-	r.setHeader("Content-Type", "text/html");
-	r.end("0");
-});
+group.route("POST", "/goapi/getLatestAssetId/", (_, r) => { r.setHeader("Content-Type", "text/html"); r.end("0"); });
 group.route("POST", "/api_v2/asset/update/", (req, res) => {
 	const id = req.body.data?.id ?? req.body.data?.starter_id ?? null;
 	const title = req.body.data?.title ?? null;
@@ -192,11 +171,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 	if (!ext) {
 		return res.status(400).json({ msg: "File type could not be determined" });
 	}
-	let info: Partial<Asset> = {
-		type: req.body.type,
-		subtype: req.body.subtype,
-		title: req.body.name || filename
-	};
+	let info: Partial<Asset> = { type: req.body.type, subtype: req.body.subtype, title: req.body.name || filename };
 	let stream: any;
 	let finalExt = ext;
 	const ok = info.subtype == "video" ? "video" : info.type;
@@ -205,9 +180,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 	}
 	if (ext !== "swf" && ["webp", "tif", "tiff", "avif"].includes(ext)) {
 		try {
-			const buffer = execSync(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -f image2pipe -vcodec png -`);
-			stream = Readable.from(buffer);
-			finalExt = "png";
+			const buffer = execSync(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -f image2pipe -vcodec png -`); stream = Readable.from(buffer); finalExt = "png";
 		} catch (err) {
 			console.error("FFmpeg conversion error:", err);
 			return res.status(500).json({ msg: "Conversion failed" });
@@ -218,9 +191,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 			case "bg": {
 				if (finalExt != "swf") {
 					try {
-						const buffer = execSync(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -vf "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0" -f image2pipe -vcodec png -`);
-						stream = Readable.from(buffer);
-						finalExt = "png";
+						const buffer = execSync(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -vf "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0" -f image2pipe -vcodec png -`); stream = Readable.from(buffer); finalExt = "png";
 					} catch (err) {
 						console.error("FFmpeg resize error:", err);
 						return res.status(500).json({ msg: "Failed to process background" });
@@ -241,54 +212,41 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 				const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.mp3`);
 				const writeStream = fs.createWriteStream(temppath);
 				await new Promise((resolve, reject) => {
-					const timer = setTimeout(() => {
-						writeStream.close();
+					const timer = setTimeout(() => { writeStream.close();
 						if (fs.existsSync(temppath)) fs.unlinkSync(temppath);
 						reject("Read stream timed out");
 					}, 1.2e6);
-					soundStream
-						.on("end", () => {
-							clearTimeout(timer);
-							resolve(true);
-						})
-						.pipe(writeStream);
+					soundStream .on("end", () => { clearTimeout(timer); resolve(true); }) .pipe(writeStream);
 				});
-				const ffdata = (await asyncFfprobe(temppath)) as FfprobeData;
-				info.duration = Math.floor(ffdata.format.duration * 1e3);
+				const ffdata = getMediaInfo(temppath);
+				info.duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
 				info.id = await AssetModel.save(temppath, "mp3", info);
 				if (fs.existsSync(temppath)) fs.unlinkSync(temppath);
 				break;
 			}
 			case "prop": {
 				if (info.subtype == "video") {
-					const data = (await asyncFfprobe(filepath)) as FfprobeData;
-					info.width = data.streams[0].width || (data.streams[1] ? data.streams[1].width : 0);
-					info.height = data.streams[0].height || (data.streams[1] ? data.streams[1].height : 0);
+					const ffdata = getMediaInfo(filepath);
+					info.width = ffdata.streams?.[0]?.width || (ffdata.streams?.[1] ? ffdata.streams[1].width : 0);
+					info.height = ffdata.streams?.[0]?.height || (ffdata.streams?.[1] ? ffdata.streams[1].height : 0);					
 					const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.flv`);
-					await new Promise((resolve, rej) => {
-						Ffmpeg(filepath)
-							.output(temppath)
-							.on("end", resolve)
-							.on("error", rej)
-							.run();
-					});
+					try {
+						execSync(`"${ffmpegPath}" -hide_banner -loglevel error -y -i "${filepath}" "${temppath}"`);
+					} catch (err) {
+						console.error("FFmpeg video conversion error:", err);
+						return res.status(500).json({ msg: "Video processing failed" });
+					}
 					info.id = await AssetModel.save(temppath, "flv", info);
 					if (fs.existsSync(temppath)) fs.unlinkSync(temppath);
 					const thumbPath = path.join(AssetModel.folder, info.id.slice(0, -3) + "png");
-					await new Promise((resolve, rej) => {
-						Ffmpeg(filepath)
-							.seek("0:00")
-							.output(thumbPath)
-							.outputOptions("-frames", "1")
-							.on("end", resolve)
-							.on("error", rej)
-							.run();
-					});
+					try {
+						execSync(`"${ffmpegPath}" -hide_banner -loglevel error -y -ss 00:00:00 -i "${filepath}" -frames:v 1 "${thumbPath}"`);
+					} catch (err) {
+						console.error("Thumbnail generation error:", err);
+					}
 				} else if (info.subtype == "0") {
 					let { ptype } = req.body;
-					info.ptype = ["placeable", "wearable", "holdable"].includes(ptype)
-						? ptype
-						: "placeable";
+					info.ptype = ["placeable", "wearable", "holdable"].includes(ptype) ? ptype : "placeable";
 					if (!stream) {
 						stream = fs.createReadStream(filepath);
 					}
@@ -314,25 +272,15 @@ group.route("POST", "/goapi/saveSound/", async (req, res) => {
 	let filepath: string;
 	let ext: string;
 	let stream: any;
-	if (isRecord) {
-		ext = "ogg";
-		filepath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.${ext}`);
-		const buffer = Buffer.from(req.body.bytes, "base64");
-		fs.writeFileSync(filepath, buffer);
+	if (isRecord) { ext = "ogg"; filepath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.${ext}`); const buffer = Buffer.from(req.body.bytes, "base64"); fs.writeFileSync(filepath, buffer);
 	} else {
 		filepath = req.files.Filedata.filepath;
-		ext = path.extname(req.files.Filedata.originalFilename || filepath)
-			.slice(1)
-			.toLowerCase();
+		ext = path.extname(req.files.Filedata.originalFilename || filepath) .slice(1) .toLowerCase();
 		if (!ext) {
 			return res.status(400).json({ msg: "File type could not be determined" });
 		}
 	}
-	const info: Partial<Asset> = {
-		type: "sound",
-		subtype: req.body.subtype,
-		title: req.body.title
-	};
+	const info: Partial<Asset> = { type: "sound", subtype: req.body.subtype, title: req.body.title };
 	try {
 		let tempToUnlink: string | null = null;
 		if (ext != "mp3") {
@@ -340,25 +288,14 @@ group.route("POST", "/goapi/saveSound/", async (req, res) => {
 			const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.mp3`);
 			tempToUnlink = temppath;
 			const writeStream = fs.createWriteStream(temppath);
-			await new Promise((resolve, reject) => {
-				stream
-					.pipe(writeStream)
-					.on("finish", resolve)
-					.on("error", reject);
+			await new Promise((resolve, reject) => { stream .pipe(writeStream) .on("finish", resolve) .on("error", reject);
 			});
-			if (isRecord && fs.existsSync(filepath)) {
-				fs.unlinkSync(filepath);
-			}
+			if (isRecord && fs.existsSync(filepath)) { fs.unlinkSync(filepath); }
 			filepath = temppath;
-		}
-		const ffdata = await asyncFfprobe(filepath);
-		const duration = Math.floor(ffdata.format.duration * 1e3);
-		const meta = {
-			duration,
-			type: "sound",
-			subtype: info.subtype || "Voiceover",
-			title: info.title || "Microphone recording"
-		};
+		}	
+		const ffdata = getMediaInfo(filepath);
+		const duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
+		const meta = { duration, type: "sound", subtype: info.subtype || "Voiceover", title: info.title || "Microphone recording" };
 		const id = await AssetModel.save(filepath, "mp3", meta);
 		if (tempToUnlink && fs.existsSync(tempToUnlink)) {
 			fs.unlinkSync(tempToUnlink);
@@ -366,10 +303,7 @@ group.route("POST", "/goapi/saveSound/", async (req, res) => {
 		if (isRecord && ext == "mp3" && fs.existsSync(filepath)) {
 			fs.unlinkSync(filepath);
 		}
-		const safeTitle = (meta.title || "")
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;");
+		const safeTitle = (meta.title || "") .replace(/&/g, "&amp;") .replace(/</g, "&lt;") .replace(/>/g, "&gt;");
 		const responseXml = `<asset><id>${id}</id><enc_asset_id>${id}</enc_asset_id><type>sound</type><subtype>voiceover</subtype><title>${safeTitle}</title><published>1</published><tags>speech</tags><duration>${duration}</duration><downloadtype>progressive</downloadtype><file>${id}</file></asset>`;
 		res.setHeader("Content-Type", "text/html; charset=UTF-8");
 		res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
