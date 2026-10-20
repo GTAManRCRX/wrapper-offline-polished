@@ -14,7 +14,6 @@ const BASE_OPTIONS = {
 		"electron",
 		"@ffmpeg-installer/ffmpeg",
 		"@ffprobe-installer/ffprobe",
-		"formidable",
 	],
 	platform: "node",
 	target: "node14",
@@ -147,7 +146,6 @@ if (process.argv.includes("--dev")) {
 			return [
 				"@ffmpeg-installer/ffmpeg",
 				"@ffprobe-installer/ffprobe",
-				"formidable",
 			].indexOf(a[0]) != -1;
 		})),
 		scripts: {
