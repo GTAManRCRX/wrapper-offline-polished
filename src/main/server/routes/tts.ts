@@ -24,7 +24,7 @@ group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 	const filename = `${randomBytes(16).toString("hex")}.mp3`;
 	const filepath = path.join(Directories.asset, filename);
 	const writeStream = fs.createWriteStream(filepath);
-	const text = rawText.substring(0, 320);
+	const text = rawText.substring(0, 500);
 	try {
 		await processVoice(voice, text).then((data: any) => {
 			return new Promise((resolve, reject) => {
