@@ -193,7 +193,7 @@ group.route("POST", "/api/movie/upload", async (req, res) => {
 	const isZip = buffer.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
 	if (!isZip) {
 		if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
-		console.error("Movie upload blocked: Not a Wrapper offline video");
+		console.error("Movie import blocked: Not a Wrapper offline video");
 		return res.status(400).json({ msg: "The file is invalid" });
 	}
 	try {
@@ -202,7 +202,7 @@ group.route("POST", "/api/movie/upload", async (req, res) => {
 		const hasMovie = "movie.xml" in files;
 		if (!hasUgc || !hasMovie) {
 			if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
-			console.error(`Movie upload blocked: Missing required XMLs (ugc: ${hasUgc}, movie: ${hasMovie})`);
+			console.error(`Movie import blocked: Missing required XMLs (ugc: ${hasUgc}, movie: ${hasMovie})`);
 			return res.status(400).json({ msg: "Invalid project file, there is no ugc.xml inside the ZIP" });
 		}
 		const id = await MovieModel.upload(buffer, isStarter);

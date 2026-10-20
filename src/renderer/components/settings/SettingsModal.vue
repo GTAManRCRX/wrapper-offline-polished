@@ -114,12 +114,12 @@ onUnmounted(() => {
 						<template #title>When double clicking a video</template>
 					</SettingToggle>
 					<SettingToggle id="onMovieUpload" :options="{ play: 'Open video player', edit: 'Open video editor', none: 'Do nothing', }" local>
-						<template #title>After uploading a video</template>
+						<template #title>After importing a video</template>
 					</SettingToggle>
 					<SettingToggle id="saveLogFiles" binary>
 						<template #title>Save log files</template>
-						<template #description>Saves everything in the console to the LOGS folder. This may take up a lot of space if left on<br/>
-							<i>Applies on next restart.</i></template>
+						<template #description>Saves everything in the console to the LOGS folder which may take up a lot of space if left on<br/>
+							<i>Applies on next restart</i></template>
 					</SettingToggle>
 				</div>
 				<div v-if="selectedTab == 'appearance'" class="tab">

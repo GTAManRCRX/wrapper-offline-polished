@@ -226,7 +226,7 @@ function onUploadSuccess(
 		<div class="file_type_help" v-show="pendingFiles.length < 1">
 			<div class="instructions">
 				<img class="import_icon" src="/img/importer/import.svg"/>
-				<h3>Select or drop a file to upload</h3>
+				<h3>Select or drop a file to import</h3>
 			</div>
 			<h4>Supported file types</h4>
 			<ul>

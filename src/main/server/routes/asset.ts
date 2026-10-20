@@ -239,12 +239,14 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 			case "prop": {
 				if (info.subtype == "video") {
 					const ffdata = await getMediaInfo(filepath);
-					info.width = ffdata.streams?.[0]?.width || (ffdata.streams?.[1] ? ffdata.streams[1].width : 0);
-					info.height = ffdata.streams?.[0]?.height || (ffdata.streams?.[1] ? ffdata.streams[1].height : 0);					
+					const origWidth = ffdata.streams?.[0]?.width || (ffdata.streams?.[1] ? ffdata.streams[1].width : 0);
+					const origHeight = ffdata.streams?.[0]?.height || (ffdata.streams?.[1] ? ffdata.streams[1].height : 0);	
+					info.width = 350;
+					info.height = origWidth > 0 ? (Math.floor((origHeight * 350) / origWidth) & ~1) : 0;
 					const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.flv`);
 					uploadProgressMap.set(progressId, 45);
 					await new Promise((resolve, reject) => {
-						exec(`"${ffmpegPath}" -hide_banner -loglevel error -y -i "${filepath}" -q:v 2 "${temppath}"`, (err) => {
+						exec(`"${ffmpegPath}" -hide_banner -loglevel error -y -i "${filepath}" -vf scale=350:-2 -c:v flv -q:v 2 "${temppath}"`, (err) => {
 							if (err) return reject(err);
 							resolve(true);
 						});
