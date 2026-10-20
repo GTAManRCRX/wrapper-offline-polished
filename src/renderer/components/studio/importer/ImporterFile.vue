@@ -103,16 +103,8 @@ import locale from "../../../locale/en_US";
 import { PendingFile } from "./AssetImporter.vue";
 import { Ref, ref, toValue, useTemplateRef, watch } from "vue";
 export type AssetStatus = "await_type" | "await_ptype" | "uploading" | "error" | "finished";
-const emit = defineEmits<{
-	cancelClicked: [],
-	statusUpdated: [AssetStatus],
-	uploadFail: [string],
-	uploadSuccess: [string, string, Record<string, string>],
-	addToScene: [string, string],
-}>();
-const props = defineProps<{
-	file: PendingFile
-}>();
+const emit = defineEmits<{ cancelClicked: [], statusUpdated: [AssetStatus], uploadFail: [string], uploadSuccess: [string, string, Record<string, string>], addToScene: [string, string], }>();
+const props = defineProps<{ file: PendingFile }>();
 let baseType = ref("");
 let flatType = "";
 let assetType:string[] = ["", ""];
@@ -126,10 +118,7 @@ function flatTypeName(type:string): string {
 	return locale.asset.flat_type_map[type];
 }
 function lvmTypesFromflatType(type:string): [string, string] {
-	switch (type) {
-		case "bgmusic":
-		case "soundeffect":
-		case "voiceover":
+	switch (type) { case "bgmusic": case "soundeffect": case "voiceover":
 			return ["sound", type];
 		case "video":
 			return ["prop", type];
@@ -138,93 +127,41 @@ function lvmTypesFromflatType(type:string): [string, string] {
 	}
 }
 function basicTypeFromExt(ext:string) {
-	switch (ext) {
-		case "flac":
-		case "ogg":
-		case "m4a":
-		case "mp3":
-		case "wav":
-		case "wma":
+	switch (ext) { case "flac": case "ogg": case "m4a": case "mp3": case "wav": case "wma":
 			return "sound";
-		case "gif":
-		case "jpeg":
-		case "jpg":
-		case "png":
-		case "swf":
-		case "tiff":
-		case "tif":
-		case "webp":
+		case "gif": case "jpeg": case "jpg": case "png": case "swf": case "tiff": case "tif": case "webp":
 			return "image";
-		case "avi":
-		case "mkv":
-		case "mov":
-		case "mp4":
-		case "webm":
-		case "wmv":
+		case "avi": case "mkv": case "mov": case "mp4": case "webm": case "wmv":
 			return "video";
 	}
 }
-function displayError(msg:string) {
-	status.value = "error";
-	thumbUrl.value = "/img/importer/error.svg";
-	errorText.value = msg;
-	emit("uploadFail", msg);
-}
-function videoAsSound() {
-	baseType.value = "sound";
-	thumbUrl.value = `/img/importer/${baseType.value}.svg`;
-}
-function typeSelected(selected:string) {
-	flatType = selected;
-	assetType = lvmTypesFromflatType(selected);
-	if (assetType[0] == "prop" && assetType[1] != "video") {
-		status.value = "await_ptype";
+function displayError(msg:string) { status.value = "error"; thumbUrl.value = "/img/importer/error.svg"; errorText.value = msg; emit("uploadFail", msg); }
+function videoAsSound() { baseType.value = "sound"; thumbUrl.value = `/img/importer/${baseType.value}.svg`; }
+function typeSelected(selected:string) { flatType = selected; assetType = lvmTypesFromflatType(selected);
+	if (assetType[0] == "prop" && assetType[1] != "video") { status.value = "await_ptype";
 		return;
 	}
 	beginUpload();
 }
-function propTypeSelected(type:string) {
-	assetType[2] = type;
-	beginUpload();
-}
+function propTypeSelected(type:string) { assetType[2] = type; beginUpload(); }
 async function beginUpload() {
 	let title = titleElement.value.innerText;
-	if (title == "") {
-		title = "unnamed" + Math.random().toString().substring(2, 8);
-	}
+	if (title == "") { title = "unnamed" + Math.random().toString().substring(2, 8); }
 	status.value = "uploading";
 	let b = new FormData();
 	b.append("import", props.file.file);
 	b.append("name", title)
 	b.append("type", assetType[0]);
 	b.append("subtype", assetType[1]);
-	if (assetType[0] == "prop" && assetType[1] == "0") {
-		b.append("ptype", assetType[2] || "");
-	}
-	const response = await fetch(`${apiServer}/api/asset/upload`, {
-		method: "POST",
-		body: b
-	});
-	if (!response.ok) {
-		status.value = "finished";
-		displayError("An unknown error occurred");
-		return;
-	}
+	if (assetType[0] == "prop" && assetType[1] == "0") { b.append("ptype", assetType[2] || ""); }
+	const response = await fetch(`${apiServer}/api/asset/upload`, { method: "POST", body: b });
+	if (!response.ok) { status.value = "finished"; displayError("An unknown error occurred"); return; }
 	const responseData = await response.json();
 	uploadComplete(responseData);
 }
-function uploadComplete(responseJson:any): void {
-	status.value = "finished";
-	assetId = responseJson.id;
+function uploadComplete(responseJson:any): void { status.value = "finished"; assetId = responseJson.id;
 	const title = responseJson.title;
-	let lvmObject:Record<string, string> = {
-		file: assetId,
-		enc_asset_id: assetId,
-		title: title,
-		tags: "",
-		type: assetType[0],
-		subtype: assetType[1],
-	};
+	let lvmObject:Record<string, string> = { file: assetId, enc_asset_id: assetId, title: title, tags: "", type: assetType[0], subtype: assetType[1], };
 	const importType = assetType[1] == "video" ? "video" : assetType[0];
 	switch (importType) {
 		case "prop": {
@@ -268,13 +205,10 @@ thumbUrl.value = `/img/importer/${baseType.value}.svg`;
 					<img class="asset_preview" :src="thumbUrl"/>
 					<div>
 						<h4 contenteditable spellcheck="false" class="asset_title" ref="asset-title">
-							{{ props.file.name }}
+							{{ props.file.name.substring(0, props.file.name.lastIndexOf('.')) || props.file.name }}
 						</h4>
 						<p class="asset_subtype">
-							{{ props.file.size }} - 
-							{{ status == "await_type" ?
-								"Import as..." :
-								status != 'error' ? flatTypeName(flatType) : errorText }}
+							{{ props.file.size }} -  {{ status == "await_type" ? "Import as" : status != 'error' ? flatTypeName(flatType) : errorText }}
 						</p>
 					</div>
 				</div>

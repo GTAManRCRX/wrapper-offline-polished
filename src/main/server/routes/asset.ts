@@ -170,7 +170,8 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 	}
 	const progressId = req.body.progressId || randomBytes(8).toString("hex");
 	uploadProgressMap.set(progressId, 5);
-	let info: Partial<Asset> = { type: req.body.type, subtype: req.body.subtype, title: req.body.name || filename };
+	const assetTitle = req.body.name ? path.parse(req.body.name).name : filename;
+	let info: Partial<Asset> = { type: req.body.type, subtype: req.body.subtype, title: assetTitle };
 	let stream: any;
 	let finalExt = ext;
 	const ok = info.subtype == "video" ? "video" : info.type;
