@@ -62,7 +62,6 @@ import WatermarkManager from "./WatermarkManager.vue";
 const emit = defineEmits<{
 	userClose: []
 }>();
-
 const tabs = [
 	{
 		id: "behavior",
@@ -78,24 +77,15 @@ const tabs = [
 	}
 ];
 const selectedTab = ref(tabs[0].id);
-
-function switchTab(id:string) {
-	selectedTab.value = id;
-}
-
+function switchTab(id:string) { selectedTab.value = id; }
 function escPress(e:KeyboardEvent) {
 	if (e.key != "Escape") {
 		return;
 	}
 	emit("userClose");
 }
-
-onMounted(() => {
-	document.addEventListener("keydown", escPress);
-});
-onUnmounted(() => {
-	document.removeEventListener("keydown", escPress);
-});
+onMounted(() => { document.addEventListener("keydown", escPress); });
+onUnmounted(() => { document.removeEventListener("keydown", escPress); });
 </script>
 
 <template>
@@ -125,7 +115,7 @@ onUnmounted(() => {
 				<div v-if="selectedTab == 'appearance'" class="tab">
 					<SettingToggle id="darkMode" binary local>
 						<template #title>Dark mode</template>
-						<template #description><i>Does not apply in the video editor or the character creator</i></template>
+						<template #description><i>Does not apply in the video editor or the character maker</i></template>
 					</SettingToggle>
 					<SettingToggle id="isWide" :options="{ false: '14:9', true: '16:9' }">
 						<template #title>Aspect ratio</template>
@@ -146,7 +136,6 @@ onUnmounted(() => {
 					<WatermarkManager/>
 				</div>
 			</div>
-			
 			<template #foot>
 				<Button primary @click="$emit('userClose')">Close</Button>
 			</template>

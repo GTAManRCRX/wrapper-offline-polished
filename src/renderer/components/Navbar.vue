@@ -114,43 +114,19 @@ import DropdownItem from "./controls/DropdownItem.vue";
 import { useRouter } from "vue-router";
 import useListStore from "../composables/useListStore";
 
-export interface NavbarEntry {
-	path: string,
-	title: string,
-};
-const emit = defineEmits<{
-	downloadClick: [],
-	newFolderClick: []
-}>();
-defineProps<{ count?: number, entries: NavbarEntry[], supported?: { download?: boolean, newFolder?: boolean, search?: boolean, viewMode?: boolean, zoom?: boolean, } }>();
+export interface NavbarEntry { path: string, title: string, };
+const emit = defineEmits<{ downloadClick: [], newFolderClick: [] }>(); defineProps<{ count?: number, entries: NavbarEntry[], supported?: { download?: boolean, newFolder?: boolean, search?: boolean, viewMode?: boolean, zoom?: boolean, } }>();
 
 const router = useRouter();
 const { search, viewMode, zoomLevel } = useListStore();
 
-function backButtonClick() {
-	router.back();
-}
-function forwardButtonClick() {
-	router.forward();
-}
-function onSearchInput(e:InputEvent) {
-	const target = e.currentTarget as HTMLInputElement;
-	search.set(target.value);
-}
-function downloadButton_click() {
-	emit("downloadClick");
-}
-function newFolderClick() {
-	emit("newFolderClick");
-}
-function changeView(newView:"grid"|"list") {
-	viewMode.set(newView);
-}
-function zoomSliderMoved(e:InputEvent) {
-	const target = e.currentTarget as HTMLInputElement;
-	const newVal = target.valueAsNumber;
-	zoomLevel.set(newVal);
-}
+function backButtonClick() { router.back(); }
+function forwardButtonClick() { router.forward(); }
+function onSearchInput(e:InputEvent) { const target = e.currentTarget as HTMLInputElement; search.set(target.value); }
+function downloadButton_click() { emit("downloadClick"); }
+function newFolderClick() { emit("newFolderClick"); }
+function changeView(newView:"grid"|"list") { viewMode.set(newView); }
+function zoomSliderMoved(e:InputEvent) { const target = e.currentTarget as HTMLInputElement; const newVal = target.valueAsNumber; zoomLevel.set(newVal); }
 </script>
 
 <template>
@@ -174,7 +150,7 @@ function zoomSliderMoved(e:InputEvent) {
 		<div class="head_right">
 			<div v-if="supported?.download"
 				class="nav_btn"
-				title="Download"
+				title="Export"
 				@click="downloadButton_click">
 				<i class="ico download"></i>
 			</div>

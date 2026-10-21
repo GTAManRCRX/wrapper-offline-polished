@@ -40,11 +40,7 @@ const ccObject = useTemplateRef<CCObjectType>("cc-object");
 const route = useRoute();
 const router = useRouter();
 const tempStorage = useTempStorage();
-
-const baseNavbarEntry = {
-	path: "/characters",
-	title: "Characters"
-};
+const baseNavbarEntry = { path: "/characters", title: "Characters" };
 const navbarEntries:Ref<NavbarEntry[]> = ref([]);
 const showDlButton = ref(false);
 const showObject = ref(false);
@@ -54,10 +50,7 @@ let themeId = "";
 const updateVW = () => document.documentElement.style.setProperty('--win-w', window.innerWidth);
 window.addEventListener('resize', updateVW); updateVW();
 
-function initObject(id:string) {
-	themeId = id;
-	showSelector.value = false;
-	showObject.value = true;
+function initObject(id:string) { themeId = id; showSelector.value = false; showObject.value = true;
 	const xml = tempStorage.retrieve("charXmlData") as string | void;
 	if (typeof xml != "undefined") {
 		ccObject.value.uploadCharacter(themeId, xml);
@@ -65,28 +58,9 @@ function initObject(id:string) {
 	}
 	ccObject.value.displayBrowser(themeId);
 }
-
-function ccEntered() {
-	navbarEntries.value.push({
-		title: "Creating a character"
-	});
-	showDlButton.value = true;
-}
-
-function charDownload() {
-	const xml = ccObject.value.getXml();
-	const elem = document.createElement("a");
-	elem.href = "data:text/xml," + xml;
-	elem.download = "character.xml";
-	elem.click();
-	elem.remove();
-}
-
-function charSaved() {
-	populateNavbar();
-	ccObject.value.displayBrowser(themeId);
-}
-
+function ccEntered() { navbarEntries.value.push({ title: "Making a character" }); showDlButton.value = true; }
+function charDownload() { const xml = ccObject.value.getXml(); const elem = document.createElement("a"); elem.href = "data:text/xml," + xml; elem.download = "character.xml"; elem.click(); elem.remove(); }
+function charSaved() { populateNavbar(); ccObject.value.displayBrowser(themeId); }
 function themeIdCheck() {
 	if (themeId.length > 0) {
 		populateNavbar();
@@ -96,7 +70,6 @@ function themeIdCheck() {
 		showObject.value = false;
 	}
 }
-
 async function populateNavbar() {
 	const themeList = await useThemeList();
 	const theme = themeList.find(t => t.cc_theme_id == themeId);
@@ -109,26 +82,9 @@ async function populateNavbar() {
 	];
 	showDlButton.value = false;
 }
-
-function themeClicked(id:string) {
-	router.push({
-		name: "cc_page",
-		params: {
-			themeId: id
-		}
-	});
-}
-
-onBeforeRouteUpdate((newRoute) => {
-	ccObject.value.reset();
-	themeId = newRoute.params.themeId as string || "";
-	themeIdCheck();
-});
-
-onMounted(() => {
-	themeId = route.params.themeId as string || "";
-	themeIdCheck();
-});
+function themeClicked(id:string) { router.push({ name: "cc_page", params: { themeId: id } }); }
+onBeforeRouteUpdate((newRoute) => { ccObject.value.reset(); themeId = newRoute.params.themeId as string || ""; themeIdCheck(); });
+onMounted(() => { themeId = route.params.themeId as string || ""; themeIdCheck(); });
 </script>
 
 <template>
