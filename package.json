@@ -6,7 +6,6 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
-		"postinstall": "node scripts/fixModules.js",
 		"dev": "concurrently \"NODE_OPTIONS='--no-deprecation' node scripts/build.mjs --dev\" \"vite dev\"",
 		"build": "vite build && node scripts/build.mjs",
 		"package": "npx electron-packager dist --icon=dist/favicon.ico --overwrite"
