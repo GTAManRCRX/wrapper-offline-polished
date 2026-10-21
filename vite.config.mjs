@@ -14,7 +14,8 @@ process.env.VITE_WRAPPER_VER = config.WRAPPER_VER;
 export default defineConfig({
 	base: "",
 	esbuild: {
-		target: "es2020"
+		target: "es2020",
+		legalComments: "none"
 	},
 	build: {
 		assetsDir: "r_assets",

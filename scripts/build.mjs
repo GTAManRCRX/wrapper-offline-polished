@@ -13,7 +13,7 @@ const BASE_OPTIONS = {
 	external: [
 		"electron",
 		"@ffmpeg-installer/ffmpeg",
-		"@ffprobe-installer/ffprobe",
+		"ffprobe-static",
 	],
 	platform: "node",
 	target: "node14",
@@ -145,7 +145,7 @@ if (process.argv.includes("--dev")) {
 		dependencies: Object.fromEntries(Object.entries(pkg.dependencies).filter((a) => {
 			return [
 				"@ffmpeg-installer/ffmpeg",
-				"@ffprobe-installer/ffprobe",
+				"ffprobe-static",
 			].indexOf(a[0]) != -1;
 		})),
 		scripts: {

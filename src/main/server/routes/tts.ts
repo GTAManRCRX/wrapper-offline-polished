@@ -8,10 +8,12 @@ import processVoice from "../models/tts";
 import { randomBytes } from "crypto";
 import { Readable } from "stream";
 import { exec } from "child_process";
-import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
+import ffprobePathObj from "ffprobe-static";
 
 const group = new httpz.Group();
 const voices = info.voices, langs = {};
+
+const ffprobePath = (ffprobePathObj as any).path;
 
 Object.keys(voices).forEach((i) => { const v = voices[i], l = v.language; langs[l] = langs[l] || []; langs[l].push(`<voice id="${i}" desc="${v.desc}" sex="${v.gender}" demo-url="" country="${v.country}" plus="N"/>`); });
 const xml = `${process.env.XML_HEADER}<voices>${ Object.keys(langs).sort().map(i => { const v = langs[i], l = info.languages[i]; return `<language id="${i}" desc="${l}">${v.join("")}</language>`; }).join("")}</voices>`;

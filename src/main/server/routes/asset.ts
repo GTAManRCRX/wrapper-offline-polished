@@ -11,7 +11,9 @@ import { randomBytes } from "crypto";
 import { Readable } from "stream";
 import { exec } from "child_process";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
-import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
+import ffprobePathObj from "ffprobe-static";
+
+const ffprobePath = (ffprobePathObj as any).path;
 
 const group = new httpz.Group();
 
