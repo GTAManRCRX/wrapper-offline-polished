@@ -92,11 +92,6 @@ if (process.argv.includes("--dev")) {
 		await ctx.rebuild();
 		await ctx.dispose();
 	}
-	mkdirSync(join(import.meta.dirname, "../dist/scripts"), { recursive: true });
-	copyFileSync(
-		join(import.meta.dirname, "./fixModules.js"),
-		join(import.meta.dirname, "../dist/scripts/fixModules.js"),
-	);
 	console.log("Copying Flash Player version 34.0.0.118 to the build folder");
 	const flashSource = join(import.meta.dirname, "../extensions");
 	const flashDest = join(import.meta.dirname, "../dist/extensions");
@@ -107,7 +102,6 @@ if (process.argv.includes("--dev")) {
 	} else {
 		console.warn("Flash Player is not found at " + flashSource);
 	}
-
 	console.log("Copying resources to the build folder");
 	const staticSource = join(import.meta.dirname, "../resources/static");
 	const staticDest = join(import.meta.dirname, "../dist/static");
@@ -118,14 +112,12 @@ if (process.argv.includes("--dev")) {
 	} else {
 		console.warn("Resources are not found at " + staticSource);
 	}
-
 	console.log("Copying favicons to the build folder");
 	const favTypes = [
 		{ name: "favicon.ico", src: "../resources/favicon.ico", dest: "../dist/favicon.ico" },
 		{ name: "favicon.icns", src: "../resources/favicon.icns", dest: "../dist/favicon.icns" },
 		{ name: "favicon.png", src: "../resources/favicon.png", dest: "../dist/favicon.png" }
 	];
-
 	for (const fav of favTypes) {
 		const srcPath = join(import.meta.dirname, fav.src);
 		const destPath = join(import.meta.dirname, fav.dest);
@@ -137,7 +129,6 @@ if (process.argv.includes("--dev")) {
 			console.warn(`${fav.name} is not found at ${srcPath}`);
 		}
 	}
-
 	const pkgJson = {
 		name: pkg.name,
 		description: pkg.description,
