@@ -60,11 +60,14 @@
 	border: none;
 }
 .importer_asset .asset_btns button:focus {
-	outline: none
+	outline: none;
 }
 .importer_asset .asset_btns button:hover {
 	background: #0000000a;
 	transition: none;
+}
+.loading_bar {
+	margin-bottom: 6px;
 }
 .loading_bar {
 	margin-bottom: 6px;
@@ -75,26 +78,42 @@
 	height: 14px;
 	border-radius: 999px;
 	overflow: hidden;
+	position: relative;
 }
 .loading_thumb {
 	background: #ff3888;
 	border: 1px solid #dedee3;
 	border-radius: 99px;
-	animation: 3s linear infinite trackmove;
-	margin-left: -27px;
-	width: 140px;
 	height: 10px;
+	width: 0%;
+	transition: width 0.2s ease-out;
+	position: relative;
+	z-index: 1;
 }
-@keyframes trackmove {
-	0%   { margin-left: -140px; }
-	100% { margin-left: 320px }
+.loading_percent {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: bold;
+	pointer-events: none;
+	z-index: 2;
+	color: #333;
 }
-.slide-enter-active {
-	animation: slide 0.15s var(--slide-anim);
-}
-@keyframes slide {
-	0%   { transform: translateX(-500px) }
-	100% { transform: translateX(0) }
+.loading_percent_white {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: bold;
+	pointer-events: none;
+	z-index: 3;
+	color: #fff;
+	clip-path: inset(0 calc(100% - var(--progress)) 0 0);
 }
 </style>
 <script setup lang="ts">
@@ -102,23 +121,32 @@ import { apiServer } from "../../../utils/AppInit";
 import locale from "../../../locale/en_US";
 import { PendingFile } from "./AssetImporter.vue";
 import { Ref, ref, toValue, useTemplateRef, watch } from "vue";
+
 export type AssetStatus = "await_type" | "await_ptype" | "uploading" | "error" | "finished";
-const emit = defineEmits<{ cancelClicked: [], statusUpdated: [AssetStatus], uploadFail: [string], uploadSuccess: [string, string, Record<string, string>], addToScene: [string, string], }>();
+
+const emit = defineEmits<{ cancelClicked: []; statusUpdated: [AssetStatus]; uploadFail: [string]; uploadSuccess: [string, string, Record<string, string>]; addToScene: [string, string]; }>();
 const props = defineProps<{ file: PendingFile }>();
+
 let baseType = ref("");
 let flatType = "";
-let assetType:string[] = ["", ""];
+let assetType: string[] = ["", ""];
 let assetId = "";
-const status:Ref<AssetStatus> = ref("await_type");
+const status: Ref<AssetStatus> = ref("await_type");
 const thumbUrl = ref("");
 const titleElement = useTemplateRef("asset-title");
 const errorText = ref("");
-watch(status, (newStatus:AssetStatus) => emit("statusUpdated", newStatus));
-function flatTypeName(type:string): string {
+const uploadProgress = ref(0);
+
+watch(status, (newStatus: AssetStatus) => emit("statusUpdated", newStatus));
+
+function flatTypeName(type: string): string {
 	return locale.asset.flat_type_map[type];
 }
-function lvmTypesFromflatType(type:string): [string, string] {
-	switch (type) { case "bgmusic": case "soundeffect": case "voiceover":
+function lvmTypesFromflatType(type: string): [string, string] {
+	switch (type) {
+		case "bgmusic":
+		case "soundeffect":
+		case "voiceover":
 			return ["sound", type];
 		case "video":
 			return ["prop", type];
@@ -126,8 +154,9 @@ function lvmTypesFromflatType(type:string): [string, string] {
 			return [type, "0"];
 	}
 }
-function basicTypeFromExt(ext:string) {
-	switch (ext) { case "flac": case "ogg": case "m4a": case "mp3": case "wav": case "wma":
+function basicTypeFromExt(ext: string) {
+	switch (ext) {
+		case "flac": case "ogg": case "m4a": case "mp3": case "wav": case "wma":
 			return "sound";
 		case "gif": case "jpeg": case "jpg": case "png": case "swf": case "tiff": case "tif": case "webp":
 			return "image";
@@ -135,33 +164,73 @@ function basicTypeFromExt(ext:string) {
 			return "video";
 	}
 }
-function displayError(msg:string) { status.value = "error"; thumbUrl.value = "/img/importer/error.svg"; errorText.value = msg; emit("uploadFail", msg); }
-function videoAsSound() { baseType.value = "sound"; thumbUrl.value = `/img/importer/${baseType.value}.svg`; }
-function typeSelected(selected:string) { flatType = selected; assetType = lvmTypesFromflatType(selected);
+function displayError(msg: string) { status.value = "error"; thumbUrl.value = "/img/importer/error.svg"; errorText.value = msg; emit("uploadFail", msg); }
+function videoAsSound() {
+	baseType.value = "sound";
+	thumbUrl.value = `/img/importer/${baseType.value}.svg`;
+}
+function typeSelected(selected: string) {
+	flatType = selected;
+	assetType = lvmTypesFromflatType(selected);
 	if (assetType[0] == "prop" && assetType[1] != "video") { status.value = "await_ptype";
 		return;
 	}
 	beginUpload();
 }
-function propTypeSelected(type:string) { assetType[2] = type; beginUpload(); }
-async function beginUpload() {
-	let title = titleElement.value.innerText;
-	if (title == "") { title = "unnamed" + Math.random().toString().substring(2, 8); }
-	status.value = "uploading";
-	let b = new FormData();
-	b.append("import", props.file.file);
-	b.append("name", title)
-	b.append("type", assetType[0]);
-	b.append("subtype", assetType[1]);
-	if (assetType[0] == "prop" && assetType[1] == "0") { b.append("ptype", assetType[2] || ""); }
-	const response = await fetch(`${apiServer}/api/asset/upload`, { method: "POST", body: b });
-	if (!response.ok) { status.value = "finished"; displayError("An unknown error occurred"); return; }
-	const responseData = await response.json();
-	uploadComplete(responseData);
+function propTypeSelected(type: string) {
+	assetType[2] = type;
+	beginUpload();
 }
-function uploadComplete(responseJson:any): void { status.value = "finished"; assetId = responseJson.id;
+function pollProgress(progressId: string) {
+	const interval = setInterval(async () => {
+		try {
+			const r = await fetch(`${apiServer}/api/asset/upload/progress/${progressId}`);
+			if (!r.ok) return;
+			const data = await r.json();
+			if (typeof data.progress === "number" && data.progress >= 0) {
+				uploadProgress.value = Math.max(uploadProgress.value, data.progress);
+			}
+		} catch {
+		}
+	}, 200);
+	return () => clearInterval(interval);
+}
+async function beginUpload() {
+	let title = titleElement.value?.innerText ?? "";
+	if (title === "") { title = "unnamed" + Math.random().toString().substring(2, 8); }
+	status.value = "uploading";
+	uploadProgress.value = 0;
+	const progressId = Math.random().toString(36).slice(2, 12);
+	const formData = new FormData();
+	formData.append("import", props.file.file);
+	formData.append("name", title);
+	formData.append("type", assetType[0]);
+	formData.append("subtype", assetType[1]);
+	formData.append("progressId", progressId);
+	if (assetType[0] === "prop" && assetType[1] === "0") {
+		formData.append("ptype", assetType[2] || "");
+	}
+	const stopPolling = pollProgress(progressId);
+	try {
+		const response = await fetch(`${apiServer}/api/asset/upload`, { method: "POST", body: formData });
+		if (!response.ok) { displayError("An unknown error occurred");
+			return;
+		}
+		const responseData = await response.json();
+		uploadProgress.value = 100;
+		await new Promise(r => setTimeout(r, 450));
+		uploadComplete(responseData);
+	} catch (err) {
+		displayError("An unknown error occurred");
+	} finally {
+		stopPolling();
+	}
+}
+function uploadComplete(responseJson: any): void {
+	status.value = "finished";
+	assetId = responseJson.id;
 	const title = responseJson.title;
-	let lvmObject:Record<string, string> = { file: assetId, enc_asset_id: assetId, title: title, tags: "", type: assetType[0], subtype: assetType[1], };
+	let lvmObject: Record<string, string> = { file: assetId, enc_asset_id: assetId, title: title, tags: "", type: assetType[0], subtype: assetType[1] };
 	const importType = assetType[1] == "video" ? "video" : assetType[0];
 	switch (importType) {
 		case "prop": {
@@ -188,7 +257,7 @@ function uploadComplete(responseJson:any): void { status.value = "finished"; ass
 			break;
 		}
 	}
-	emit("uploadSuccess", importType, assetId, lvmObject)
+	emit("uploadSuccess", importType, assetId, lvmObject);
 }
 function addToScene() {
 	const importType = assetType[1] == "video" ? "video" : assetType[0];
@@ -202,14 +271,10 @@ thumbUrl.value = `/img/importer/${baseType.value}.svg`;
 		<Transition appear name="slide">
 			<div class="importer_asset">
 				<div class="asset_metadata">
-					<img class="asset_preview" :src="thumbUrl"/>
+					<img class="asset_preview" :src="thumbUrl" />
 					<div>
-						<h4 contenteditable spellcheck="false" class="asset_title" ref="asset-title">
-							{{ props.file.name.substring(0, props.file.name.lastIndexOf('.')) || props.file.name }}
-						</h4>
-						<p class="asset_subtype">
-							{{ props.file.size }} -  {{ status == "await_type" ? "Import as" : status != 'error' ? flatTypeName(flatType) : errorText }}
-						</p>
+						<h4 contenteditable spellcheck="false" class="asset_title" ref="asset-title">{{ props.file.name.substring(0, props.file.name.lastIndexOf('.')) || props.file.name }}</h4>
+						<p class="asset_subtype">{{ props.file.size }} - {{ status == "await_type" ? "Import as" : status != 'error' ? flatTypeName(flatType) : errorText }}</p>
 					</div>
 				</div>
 				<div v-if="status == 'await_type' && baseType == 'sound'" class="asset_btns">
@@ -235,17 +300,19 @@ thumbUrl.value = `/img/importer/${baseType.value}.svg`;
 					<button @click="$emit('cancelClicked')" class="cancel">Cancel</button>
 				</div>
 				<div v-if="status == 'uploading'" class="loading_bar">
-					<div class="loading_track"><div class="loading_thumb"></div></div>
+					<div class="loading_track">
+						<div class="loading_thumb" :style="{ width: uploadProgress + '%' }"></div>
+						<div class="loading_percent">{{ uploadProgress }}%</div>
+						<div class="loading_percent_white" :style="{ '--progress': uploadProgress + '%' }">
+							{{ uploadProgress }}%
+						</div>
+					</div>
 				</div>
 				<div v-if="status == 'error'" class="asset_btns">
 					<button @click="$emit('cancelClicked')">Close</button>
 				</div>
 				<div v-if="status == 'finished'" class="asset_btns">
-					<button
-						v-if="assetType[2] ? assetType[2] == 'placeable' : true"
-						@click="addToScene">
-						Add to scene
-					</button>
+					<button v-if="assetType[2] ? assetType[2] == 'placeable' : true" @click="addToScene">Add to scene</button>
 					<button @click="$emit('cancelClicked')">Close</button>
 				</div>
 			</div>
