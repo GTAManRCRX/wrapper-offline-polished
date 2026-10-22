@@ -19,7 +19,7 @@
 		"fflate": "0.8.3",
 		"ffprobe-static": "3.1.0",
 		"vue": "3.5.44",
-		"vue-router": "5.0.7"
+		"vue-router": "5.4.0"
 	},
 	"devDependencies": {
 		"@electron/packager": "20.3.0",
