@@ -134,156 +134,195 @@ function fontId2File(font: string) {
 }
 function toU8(buf: Buffer | Uint8Array): Uint8Array { return buf instanceof Uint8Array ? buf : new Uint8Array(buf); }
 export default {
-	async pack(xmlBuffer: Buffer, thumbBuffer?: Buffer): Promise<Buffer> {
-	if (xmlBuffer.length === 0) throw null;
-	const files: Record<string, Uint8Array> = {};
-	const themes: Record<string, boolean> = { common: true };
-	let ugc = `${header}<theme id="ugc" name="ugc">`;
-	let xmlStr = xmlBuffer.toString();
-	async function basicParse(file: string, type: string, subtype?: string): Promise<boolean> {
-		const pieces = file.split(".");
-		const themeId = pieces[0];
-		const ext = pieces.pop()!; pieces[pieces.length - 1] += "." + ext; pieces.splice(1, 0, type);
-		const filename = pieces.join(".");
-		if (themeId === "ugc") {
-			const id = pieces[2];
-			if (!AssetModel.exists(id)) return false;
-			const buffer = AssetModel.load(id, true);
-			const assetMeta = database.get("assets", id);
-			if (!assetMeta) return false;
-			ugc += AssetModel.meta2Xml(assetMeta.data);
-			files[filename] = toU8(buffer);
-			if (type === "prop" && subtype === "video") {
-				const thumbId = id.slice(0, -3) + "png";
-				if (AssetModel.exists(thumbId)) { pieces[2] = thumbId; files[pieces.join(".")] = toU8(AssetModel.load(thumbId, true));
-				}
-			}
-		} else {
-			if (type === "prop" && pieces.indexOf("head") > -1) {
-				pieces[1] = "char";
-			}
-			const filepath = path.join(store, pieces.join("/"));
-			if (!fs.existsSync(filepath)) return false; files[filename] = toU8(fs.readFileSync(filepath));
-		}
-		themes[themeId] = true;
-		return true;
-	}
-	function removeXmlElement(xml: string, tagName: string, identifier: string): string { const re = new RegExp( `<${tagName}\\b[^>]*>[\\s\\S]*?${identifier}[\\s\\S]*?<\\/${tagName}>`, "gi" ); return xml.replace(re, ""); }
-	const doc = parseXml(xmlStr) as XmlNode;
-	const film = getRootElement(doc);
-	for (const elem of elements(film, "sound")) {
-		const file = childText(elem, "sfile");
-		if (!file) continue;
-		if (!(await basicParse(file, "sound"))) {
-			xmlStr = removeXmlElement(xmlStr, "sound", file);
-		}
-	}
-	for (const scene of elements(film, "scene")) {
-		for (const elem2 of elements(scene)) {
-			let tag = elem2.name || "";
-			if (tag === "effectAsset") tag = "effect";
-			switch (tag) {
-				case "bg":
-				case "effect":
-				case "prop": {
-					const file = childText(elem2, "file");
-					if (!file) continue;
-					if (!(await basicParse(file, tag, attr(elem2, "subtype")))) { xmlStr = removeXmlElement(xmlStr, tag === "effect" ? "effectAsset|effect" : tag, file); }
-					break;
-				}
-				case "char": {
-					const file = childText(elem2, "action");
-					if (!file) break;
-					const pieces = file.split(".");
-					const themeId = pieces[0];
-					const ext = pieces.pop()!; pieces[pieces.length - 1] += "." + ext; pieces.splice(1, 0, "char");
-					let charOk = true;
-					if (themeId === "ugc") {
-						pieces.splice(3, 1);
-						const id = pieces[2];
-						if (CharModel.exists(id)) {
-							const charXml = CharModel.charXml(id); ugc += AssetModel.meta2Xml({ id, type: "char", themeId: CharModel.getThemeId(charXml), } as Char);
-							files[pieces.join(".") + ".xml"] = toU8(charXml);
-						} else {
-							charOk = false;
-						}
-					} else {
-						const filepath = path.join(store, pieces.join("/"));
-						if (fs.existsSync(filepath)) {
-							files[pieces.join(".")] = toU8(fs.readFileSync(filepath));
-						} else {
-							charOk = false;
-						}
+		async pack(xmlBuffer: Buffer, thumbBuffer?: Buffer): Promise<Buffer> {
+		if (xmlBuffer.length === 0) throw null;
+		const files: Record<string, Uint8Array> = {};
+		const themes: Record<string, boolean> = { common: true };
+		let ugc = `${header}<theme id="ugc" name="ugc">`;
+		let xmlStr = xmlBuffer.toString();
+		async function basicParse(file: string, type: string, subtype?: string): Promise<boolean> {
+			const pieces = file.split(".");
+			const themeId = pieces[0];
+			const ext = pieces.pop()!; pieces[pieces.length - 1] += "." + ext; pieces.splice(1, 0, type);
+			const filename = pieces.join(".");
+			if (themeId === "ugc") {
+				const id = pieces[2];
+				if (!AssetModel.exists(id)) return false;
+				const buffer = AssetModel.load(id, true);
+				const assetMeta = database.get("assets", id);
+				if (!assetMeta) 
+					return false;
+				ugc += AssetModel.meta2Xml(assetMeta.data); files[filename] = toU8(buffer);
+				if (type === "prop" && subtype === "video") {
+					const thumbId = id.slice(0, -3) + "png";
+					if (AssetModel.exists(thumbId)) { 
+						const tempPieces = thumbId.split(".");
+						const tempThemeId = tempPieces[0];
+						const tempExt = tempPieces.pop()!; tempPieces[tempPieces.length - 1] += "." + tempExt; tempPieces.splice(1, 0, type); files[tempPieces.join(".")] = toU8(AssetModel.load(thumbId, true)); 
 					}
-					if (!charOk) {
-						xmlStr = removeXmlElement(xmlStr, "char", file);
+				}
+			} else {
+				if (type === "prop" && pieces.indexOf("head") > -1) {
+					pieces[1] = "char";
+				}
+				const filepath = path.join(store, pieces.join("/"));
+				if (!fs.existsSync(filepath)) return false; files[filename] = toU8(fs.readFileSync(filepath));
+			}
+			themes[themeId] = true;
+			return true;
+		}
+		const doc = parseXml(xmlStr) as XmlNode;
+		const film = getRootElement(doc);
+		if (film.children) {
+			const validChildren: XmlNode[] = [];
+			for (const elem of film.children) {
+				if (elem.type === "element" && elem.name === "sound") {
+					const file = childText(elem, "sfile");
+					if (file && !(await basicParse(file, "sound"))) {
+						continue;
+					}
+				}
+				validChildren.push(elem);
+			}
+			film.children = validChildren;
+		}
+		for (const scene of elements(film, "scene")) {
+			if (!scene.children) continue;
+			const validSceneChildren: XmlNode[] = [];
+			for (const elem2 of scene.children) {
+				if (elem2.type !== "element") { validSceneChildren.push(elem2);
+					continue;
+				}
+				let tag = elem2.name || "";
+				if (tag === "effectAsset") tag = "effect";
+				switch (tag) { case "bg": case "effect": case "prop": {
+					const file = childText(elem2, "file");
+					if (!file) { validSceneChildren.push(elem2);
+						continue;
+					}
+					if (!(await basicParse(file, tag, attr(elem2, "subtype")))) {
 						break;
 					}
-					for (const elem3 of elements(elem2)) {
-						if (!elem3.children?.length) continue;
-						const subFile = childText(elem3, "file");
-						if (!subFile) continue;
-						if (elem3.name !== "head") {
-							if (!(await basicParse(subFile, "prop"))) {
-								xmlStr = removeXmlElement(xmlStr, elem3.name || "prop", subFile);
+					validSceneChildren.push(elem2);
+						break;
+					}
+					case "char": {
+						const file = childText(elem2, "action");
+						if (!file) { validSceneChildren.push(elem2);
+							break;
+						}
+						const pieces = file.split(".");
+						const themeId = pieces[0];
+						const ext = pieces.pop()!; pieces[pieces.length - 1] += "." + ext; pieces.splice(1, 0, "char");
+						let charOk = true;
+						if (themeId === "ugc") { pieces.splice(3, 1);
+							const id = pieces[2];
+							if (CharModel.exists(id)) {
+								const charXml = CharModel.charXml(id); ugc += AssetModel.meta2Xml({ id, type: "char", themeId: CharModel.getThemeId(charXml), } as Char); files[pieces.join(".") + ".xml"] = toU8(charXml);
+							} else {
+								charOk = false;
 							}
 						} else {
-							const pieces2 = subFile.split(".");
-							if (pieces2[0] === "ugc") continue;
-							pieces2.pop();
-							pieces2.splice(1, 0, "char");
-							const filepath = path.join(store, pieces2.join("/") + ".swf");
-							pieces2.splice(1, 1, "prop");
-							const filename = pieces2.join(".") + ".swf";
+							const filepath = path.join(store, pieces.join("/"));
 							if (fs.existsSync(filepath)) {
-								files[filename] = toU8(fs.readFileSync(filepath));
+								files[pieces.join(".")] = toU8(fs.readFileSync(filepath));
 							} else {
-								xmlStr = removeXmlElement(xmlStr, "head", subFile);
+								charOk = false;
 							}
 						}
+						if (!charOk) {
+							break;
+						}
+						if (elem2.children) {
+							const validCharChildren: XmlNode[] = [];
+							for (const elem3 of elem2.children) {
+								if (elem3.type !== "element" || !elem3.children?.length) { validCharChildren.push(elem3);
+									continue;
+								}
+								const subFile = childText(elem3, "file");
+								if (!subFile) { validCharChildren.push(elem3);
+									continue;
+								}
+								if (elem3.name !== "head") {
+									if (!(await basicParse(subFile, "prop"))) {
+										continue;
+									}
+								} else {
+									const pieces2 = subFile.split(".");
+									const firstPiece = pieces2[0];
+									if (firstPiece === "ugc") { validCharChildren.push(elem3);
+										continue;
+									}
+									pieces2.pop();
+									pieces2.splice(1, 0, "char");
+									const filepath = path.join(store, pieces2.join("/") + ".swf"); pieces2.splice(1, 1, "prop");
+									const filename = pieces2.join(".") + ".swf";
+									if (fs.existsSync(filepath)) { files[filename] = toU8(fs.readFileSync(filepath));
+									} else {
+										continue;
+									}
+								}
+								validCharChildren.push(elem3);
+							}
+							elem2.children = validCharChildren;
+						}
+						themes[themeId] = true;
+						validSceneChildren.push(elem2);
+						break;
 					}
-					themes[themeId] = true;
-					break;
-				}
-				case "bubbleAsset": {
-					const bubble = child(elem2, "bubble");
-					const text = child(bubble, "text");
-					const font = attr(text, "font");
-					if (!font || font === "Arial") break;
-					const filename = `${fontId2File(font)}.swf`;
-					const filepath = path.join(source, "go", "font", filename);
-					if (fs.existsSync(filepath)) {
-						files[filename] = toU8(fs.readFileSync(filepath));
+					case "bubbleAsset": {
+						const bubble = child(elem2, "bubble");
+						const text = child(bubble, "text");
+						const font = attr(text, "font");
+						if (font && font !== "Arial") {
+							const filename = `${fontId2File(font)}.swf`;
+							const filepath = path.join(source, "go", "font", filename);
+							if (fs.existsSync(filepath)) {
+								files[filename] = toU8(fs.readFileSync(filepath));
+							}
+						}
+						validSceneChildren.push(elem2);
+						break;
 					}
-					break;
+					default:
+						validSceneChildren.push(elem2);
+						break;
 				}
 			}
+			scene.children = validSceneChildren;
 		}
-	}
-	if (themes.family) {
-		delete themes.family;
-		themes.custom = true;
-	}
-	if (themes.cc2) {
-		delete themes.cc2;
-		themes.action = true;
-	}
-	const themeIds = Object.keys(themes);
-	for (const themeId of themeIds) {
-		if (themeId === "ugc") continue;
-		const xmlPath = path.join(store, themeId, "theme.xml");
-		if (fs.existsSync(xmlPath)) {
-			files[`${themeId}.xml`] = toU8(fs.readFileSync(xmlPath));
+		if (themes.family) {
+			delete themes.family;
+			themes.custom = true;
 		}
-	}
-	files["themelist.xml"] = toU8( Buffer.from( `${header}<themes>${themeIds.map((t) => `<theme>${t}</theme>`).join("")}</themes>` ) );
-	files["ugc.xml"] = toU8(Buffer.from(ugc + "</theme>"));
-	if (thumbBuffer) {
-		files["thumbnail.png"] = toU8(thumbBuffer);
-	}
-	files["movie.xml"] = toU8(Buffer.from(xmlStr));
-	return Buffer.from(zipSync(files));
-},
+		if (themes.cc2) {
+			delete themes.cc2;
+			themes.action = true;
+		}
+		const themeIds = Object.keys(themes);
+		for (const themeId of themeIds) {
+			if (themeId === "ugc") continue;
+			const xmlPath = path.join(store, themeId, "theme.xml");
+			if (fs.existsSync(xmlPath)) {
+				files[`${themeId}.xml`] = toU8(fs.readFileSync(xmlPath));
+			}
+		}
+		files["themelist.xml"] = toU8( Buffer.from( `${header}<themes>${themeIds.map((t) => `<theme>${t}</theme>`).join("")}</themes>` ) );
+		files["ugc.xml"] = toU8(Buffer.from(ugc + "</theme>"));
+		if (thumbBuffer) { files["thumbnail.png"] = toU8(thumbBuffer); }
+		const customSerialize = (node: XmlNode): string => {
+			if (node.type === "cdata") return `<![CDATA[${node.text || ""}]]>`;
+			if (node.type === "text") return escapeXml(node.text || "");
+			if (node.type !== "element" || !node.name) return "";
+			const attrs = node.attributes ? Object.entries(node.attributes).map(([k, v]) => ` ${k}="${escapeXml(v)}"`).join("") : "";
+			const inner = (node.children ?? []).map(customSerialize).join("");
+			if (!inner) return `<${node.name}${attrs}/>`;
+			return `<${node.name}${attrs}>${inner}</${node.name}>`;
+		};
+		const finalXml = (header || "") + customSerialize(film);
+		files["movie.xml"] = toU8(Buffer.from(finalXml));
+		return Buffer.from(zipSync(files));
+	},
 	async extractAudioTimes(xmlBuffer: Buffer) {
 		const doc = parseXml(xmlBuffer.toString()) as XmlNode;
 		const film = getRootElement(doc);
