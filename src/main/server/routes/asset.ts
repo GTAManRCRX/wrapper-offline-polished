@@ -9,7 +9,7 @@ import MovieModel from "../models/movie";
 import path from "path";
 import { randomBytes } from "crypto";
 import { Readable } from "stream";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import ffprobePathObj from "ffprobe-static";
 
@@ -21,13 +21,24 @@ const uploadProgressMap = new Map<string, number>();
 
 function getMediaInfo(filepath: string): Promise<any> {
 	return new Promise((resolve, reject) => {
-		exec(`"${ffprobePath}" -v error -show_entries format=duration -show_entries stream=width,height -of json "${filepath}"`, (error, stdout) => {
-			if (error) return reject(error);
-			try {
-				resolve(JSON.parse(stdout.toString()));
-			} catch (e) {
-				reject(e);
+		const child = spawn(ffprobePath, [ "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "json", filepath ]);
+		let stdoutData = "";
+		child.stdout.on("data", (chunk) => {
+			stdoutData += chunk.toString();
+		});
+		child.on("close", (code) => {
+			if (code === 0) {
+				try {
+					resolve(JSON.parse(stdoutData));
+				} catch (e) {
+					reject(e);
+				}
+			} else {
+				reject(new Error(`FFprobe exited with code ${code}`));
 			}
+		});
+		child.on("error", (err) => {
+			reject(err);
 		});
 	});
 }
@@ -183,11 +194,20 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 	}
 	if (ext !== "swf" && ["webp", "tif", "tiff", "avif"].includes(ext)) {
 		await new Promise((resolve, reject) => {
-			exec(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -f image2pipe -vcodec png -`, (err, buffer) => {
-				if (err) return reject(err);
-				stream = Readable.from(buffer);
-				finalExt = "png";
-				resolve(true);
+			const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", filepath, "-f", "image2pipe", "-vcodec", "png",  "-" ]);
+			const chunks = [];
+			child.stdout.on("data", (chunk) => chunks.push(chunk));
+			child.on("close", (code) => {
+				if (code === 0) {
+					stream = Readable.from(Buffer.concat(chunks));
+					finalExt = "png";
+					resolve(true);
+				} else {
+					return reject(new Error(`FFmpeg exit code ${code}`));
+				}
+			});
+			child.on("error", (err) => {
+				return reject(err);
 			});
 		}).catch(() => {
 			uploadProgressMap.delete(progressId);
@@ -200,12 +220,21 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 			case "bg": {
 				if (finalExt != "swf") {
 					await new Promise((resolve, reject) => {
-						exec(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -vf "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0" -f image2pipe -vcodec png -`, async (err, buffer) => {
-							if (err) return reject(err);
-							stream = Readable.from(buffer);
-							finalExt = "png";
-							uploadProgressMap.set(progressId, 75);
-							resolve(true);
+						const child = spawn(ffmpegPath, ["-hide_banner",  "-loglevel", "error",  "-i", filepath,  "-vf", "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0",  "-f", "image2pipe",  "-vcodec", "png",  "-" ]);
+						const chunks = [];
+						child.stdout.on("data", (chunk) => chunks.push(chunk));
+						child.on("close", (code) => {
+							if (code === 0) {
+								stream = Readable.from(Buffer.concat(chunks));
+								finalExt = "png";
+								uploadProgressMap.set(progressId, 75);
+								resolve(true);
+							} else {
+								return reject(new Error(`FFmpeg exit code ${code}`));
+							}
+						});
+						child.on("error", (err) => {
+							return reject(err);
 						});
 					});
 				} else {
@@ -249,17 +278,23 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 					const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.flv`);
 					uploadProgressMap.set(progressId, 45);
 					await new Promise((resolve, reject) => {
-						exec(`"${ffmpegPath}" -hide_banner -loglevel error -y -i "${filepath}" -vf scale=350:-2 -c:v flv -q:v 2 "${temppath}"`, (err) => {
-							if (err) return reject(err);
-							resolve(true);
+						const child = spawn(ffmpegPath, [ "-hide_banner", "-loglevel", "error", "-y", "-i", filepath, "-vf", "scale=350:-2", "-c:v", "flv", "-q:v", "2", temppath ]);
+						child.on("close", (code) => {
+							if (code === 0) return resolve(true);
+							reject(new Error(`FFmpeg video conversion failed with code ${code}`));
 						});
+						child.on("error", (err) => reject(err));
 					});
 					uploadProgressMap.set(progressId, 80);
 					info.id = await AssetModel.save(temppath, "flv", info);
 					if (fs.existsSync(temppath)) fs.unlinkSync(temppath);
 					const thumbPath = path.join(AssetModel.folder, info.id.slice(0, -3) + "png");
 					await new Promise((resolve) => {
-						exec(`"${ffmpegPath}" -hide_banner -loglevel error -y -ss 00:00:00 -i "${filepath}" -frames:v 1 "${thumbPath}"`, () => {
+						const child = spawn(ffmpegPath, [ "-hide_banner", "-loglevel", "error", "-y", "-ss", "00:00:00", "-i", filepath, "-frames:v", "1", thumbPath ]);
+						child.on("close", () => {
+							resolve(true);
+						});
+						child.on("error", () => {
 							resolve(true);
 						});
 					});
