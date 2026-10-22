@@ -3,7 +3,7 @@ import Database from "../../storage/database";
 import fileTypes from "../data/allowed_file_types.json";
 import { Group } from "@octanuary/httpz";
 import { Readable } from "stream";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import MovieModel from "../models/movie.js";
 import Settings from "../../storage/settings";
@@ -116,9 +116,13 @@ group.route("POST", "/api/watermark/save", async (req, res) => {
 	if (["webp", "tif", "tiff", "avif"].includes(ext)) {
 		try {
 			const buffer = await new Promise<Buffer>((resolve, reject) => {
-				exec(`"${ffmpegPath}" -hide_banner -loglevel error -i "${filepath}" -f image2pipe -vcodec png -`, { encoding: "buffer" as any }, (err, stdout) => {
-					if (err) return reject(err);
-					resolve(stdout);
+				const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", filepath, "-f", "image2pipe", "-vcodec", "png", "-"]);
+				const chunks: Buffer[] = [];
+				child.stdout.on("data", (chunk: Buffer) => chunks.push(chunk));
+				child.on("error", (err) => reject(err));
+				child.on("close", (code) => {
+					if (code !== 0) return reject(new Error(`FFmpeg exited with code ${code}`));
+					resolve(Buffer.concat(chunks));
 				});
 			});
 			stream = Readable.from(buffer);

@@ -7,7 +7,7 @@ import path from "path";
 import processVoice from "../models/tts";
 import { randomBytes } from "crypto";
 import { Readable } from "stream";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import ffprobePathObj from "ffprobe-static";
 
 const group = new httpz.Group();
@@ -40,11 +40,16 @@ group.route("POST", "/goapi/convertTextToSoundAsset/", async (req, res) => {
 			});
 		});
 		try {
-			const ffprobeRaw = await new Promise<string>((resolve, reject) => { exec(`"${ffprobePath}" -v error -show_entries format=duration -of json "${filepath}"`, (error, stdout) => {
-				if (error) return reject(error);
-				resolve(stdout.toString());
+			const ffprobeRaw = await new Promise<string>((resolve, reject) => {
+				const child = spawn(ffprobePath, ["-v", "error", "-show_entries", "format=duration", "-of", "json", filepath]);
+				let stdoutData = "";
+				child.stdout.on("data", (data) => { stdoutData += data.toString(); });
+				child.on("error", (error) => reject(error));
+				child.on("close", (code) => {
+					if (code !== 0) return reject(new Error(`FFprobe exited with code ${code}`));
+					resolve(stdoutData);
+				});
 			});
-		});
 			const ffdata = JSON.parse(ffprobeRaw);
 			const duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
 			const meta: Partial<Asset> = { duration, type: "sound", subtype: "tts", title: `[${voices[voice].desc}] ${text}` };
