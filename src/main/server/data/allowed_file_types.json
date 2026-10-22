@@ -1,26 +1,32 @@
 {
 	"bg": [
 		"gif",
+		"jpeg",
 		"jpg",
 		"png",
 		"swf",
 		"tif",
+		"tiff",
 		"webp"
 	],
 	"watermark": [
 		"gif",
 		"jpg",
+		"jpeg",
 		"png",
 		"swf",
 		"tif",
+		"tiff",
 		"webp"
 	],
 	"prop": [
 		"gif",
 		"jpg",
+		"jpeg",
 		"png",
 		"swf",
 		"tif",
+		"tiff",
 		"webp"
 	],
 	"sound": [
@@ -31,7 +37,6 @@
 		"mp3",
 		"wav",
 		"wma",
-
 		"asf",
 		"avi",
 		"mkv",
