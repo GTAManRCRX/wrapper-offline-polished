@@ -82,7 +82,7 @@ FFmpeg is under the GNU GPLv2 license, which grants similar rights, but has some
 | VisualPlugin | The developer of GoAnimate wrapper |
 | bro946 | VoiceForge endpoint |
 | [Vyond](https://www.vyond.com) | The creators of GoAnimate |
-| [Whispery](https://www.youtube.com/channel/UCVgwK9guSmcb3GkYLBzAbgA) | Fixing issues with Windows 11 and macOS |
+| [Whispery](https://www.youtube.com/channel/UCVgwK9guSmcb3GkYLBzAbgA) | Fixing issues with the movie database |
 
 
 [Whispery's Discord page](https://discord.com/users/1440498123997843607)
