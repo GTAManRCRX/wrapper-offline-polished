@@ -245,8 +245,10 @@ const createWindow = () => {
 	}
 	root = `${host}:${port}`;
 	mainWindow.loadURL(root);
-	mainWindow.maximize();
-    	mainWindow.show();
+	mainWindow.once("ready-to-show", () => {
+		mainWindow.maximize();
+		mainWindow.show();
+	});
 	mainWindow.on("closed", () => process.exit(0));
 };
 async function openDiscord() {

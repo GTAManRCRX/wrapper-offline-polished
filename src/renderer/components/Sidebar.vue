@@ -125,19 +125,6 @@
 .app_sidebar .spacer {
 	margin-bottom: 7px;
 }
-.app_sidebar .dragger {
-	cursor: col-resize;
-	position: absolute;
-	top: 50px;
-	float: right;
-	width: 6px;
-	height: calc(100% - 50px);
-}
-.app_sidebar .dragger:hover {
-	background: #489cf7a3;
-	transition: 0.08s ease-in;
-	transition-delay: 0.18s;
-}
 .app_sidebar h3 {
 	text-align: center;
 	color: #918fa0;
@@ -402,22 +389,6 @@ function openSettings() {
 function closeSettings() {
 	displaySettings.value = false;
 }
-function draggerDown(e:MouseEvent) {
-	inResize.value = true;
-	document.body.classList.add("col_resize");
-	const startX = e.clientX;
-	const startWidth = width.value;
-	const moveCb = (moveE2:MouseEvent) => {
-		const newWidth = startWidth - startX + moveE2.clientX;
-		setWidth(newWidth);
-	};
-	window.addEventListener("mousemove", moveCb);
-	window.addEventListener("mouseup", () => {
-		window.removeEventListener("mousemove", moveCb);
-		inResize.value = false;
-		document.body.classList.remove("col_resize");
-	});
-}
 onBeforeRouteLeave((to, from) => {
 	if (to.path.startsWith("/character") && !from.path.startsWith("/character")) {
 		window.addEventListener("resize", watchWidth);
@@ -513,11 +484,6 @@ defineExpose({ slideMode, width });
     <div class="spacer"></div>
     <span id="wrapper_ver">{{ wrapperVer }}</span>
 </ul>
-		<div
-			v-if="!slideMode.enabled"
-			class="dragger"
-			:style="{left: width - 3 + 'px'}"
-			@mousedown="draggerDown"></div>
 		<SettingsModal v-if="displaySettings" @user-close="closeSettings"/>
 		<AppInfoModal v-if="displayAppInfo" @user-close="closeAppInfo"/>
 		<input type="file" ref="char-input" accept=".xml" @input="charInput_input"/>

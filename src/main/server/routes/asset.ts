@@ -14,113 +14,72 @@ import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import ffprobePathObj from "ffprobe-static";
 
 const ffprobePath = (ffprobePathObj as any).path;
-
 const group = new httpz.Group();
-
 const uploadProgressMap = new Map<string, number>();
 
 function getMediaInfo(filepath: string): Promise<any> {
 	return new Promise((resolve, reject) => {
-		const child = spawn(ffprobePath, [ "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "json", filepath ]);
+		const child = spawn(ffprobePath, ["-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "json", filepath]);
 		let stdoutData = "";
 		child.stdout.on("data", (chunk) => { stdoutData += chunk.toString(); });
-		child.on("close", (code) => {
-			if (code === 0) {
-				try {
-					resolve(JSON.parse(stdoutData));
-				} catch (e) {
-					reject(e);
-				}
-			} else {
-				reject(new Error(`FFprobe exited with code ${code}`));
-			}
-		});
-		child.on("error", (err) => {
-			reject(err);
-		});
+		child.on("close", (code) => { if (code === 0) { try { resolve(JSON.parse(stdoutData)); } catch (e) { reject(e); } } else { reject(new Error(`FFprobe exited with code ${code}`)); } });
+		child.on("error", (err) => { reject(err); });
 	});
 }
 async function smoothTo(progressId: string, target: number, durationMs = 500) {
 	const start = uploadProgressMap.get(progressId) ?? 0;
-	if (target <= start) { uploadProgressMap.set(progressId, target);
-		return;
-	}
+	if (target <= start) { uploadProgressMap.set(progressId, target); return; }
 	const steps = 10;
 	const stepTime = durationMs / steps;
 	for (let i = 1; i <= steps; i++) {
-		const pct = Math.round(start + (target - start) * (i / steps)); uploadProgressMap.set(progressId, Math.min(100, pct));
+		const pct = Math.round(start + (target - start) * (i / steps));
+		uploadProgressMap.set(progressId, Math.min(100, pct));
 		await new Promise(r => setTimeout(r, stepTime));
 	}
 }
 group.route("GET", /^\/api\/asset\/upload\/progress\/([\w-]+)$/, (req, res) => {
 	const id = req.matches[1];
 	const progress = uploadProgressMap.get(id);
-	if (typeof progress === "undefined") {
-		return res.status(404).json({ progress: -1 });
-	}
+	if (typeof progress === "undefined") { return res.status(404).json({ progress: -1 }); }
 	res.json({ progress });
 });
 group.route("POST", "/api_v2/asset/delete/", async (req, res) => {
 	const idField = req.body.data?.id || req.body.data?.starter_id;
-	if (typeof idField == "undefined") {
-		return res.status(400).json({ status: "error", msg: "Missing required parameters" });
-	}
+	if (typeof idField == "undefined") { return res.status(400).json({ status: "error", msg: "Missing required parameters" }); }
 	const ids = idField.split(",");
 	for (const id of ids) {
 		try {
 			const asset = AssetModel.getInfo(id);
 			if (!asset) throw "404";
-			if (asset.type == "movie") {
-				await MovieModel.delete(id);
-			} else {
-				await AssetModel.delete(id);
-			}
+			if (asset.type == "movie") { await MovieModel.delete(id); } else { await AssetModel.delete(id); }
 			console.log("Deleted asset " + id);
 		} catch (err) {
-			if (err == "404") {
-				console.log(`Failed to delete asset ${id}`);
-			} else {
-				console.error(`Failed to delete asset ${id} ${err}`);
-				return res.status(500).json({ status: "error", msg: "Internal server error" });
-			}
+			if (err == "404") { console.log(`Failed to delete asset ${id}`); }
+			else { console.error(`Failed to delete asset ${id} ${err}`); return res.status(500).json({ status: "error", msg: "Internal server error" }); }
 		}
 	}
 	res.json({ status: "ok" });
 });
 group.route("GET", "/api/asset/list", (req, res) => {
 	const filter = { type: ["bg", "prop", "sound"] as any as Asset["type"] };
-	const list = AssetModel.list(filter, false) || []; res.json(list);
+	const list = AssetModel.list(filter, false) || [];
+	res.json(list);
 });
 group.route("POST", "/api_v2/assets/imported", (req, res) => {
-	if (!req.body.data.type) {
-		return res.status(400).json({ msg: "Expected data.type on request body" });
-	}
-	if (req.body.data.type == "prop") {
-		req.body.data.subtype ||= "0";
-	}
+	if (!req.body.data.type) { return res.status(400).json({ msg: "Expected data.type on request body" }); }
+	if (req.body.data.type == "prop") { req.body.data.subtype ||= "0"; }
 	const filters: Partial<Asset> = { type: req.body.data.type };
 	if (req.body.data.subtype) filters.subtype = req.body.data.subtype;
 	res.json({ status: "ok", data: { xml: AssetModel.list(filters, true) } });
 });
 group.route("POST", "/goapi/getUserAssetsXml/", (req, res) => {
-	if (req.body.type !== "char") { res.status(307).setHeader("Location", "/api_v2/assets/imported");
-		return res.end();
-	} else if (!req.body.themeId) {
-		return res.status(400).end("1<error><code>malformed</code><message/></error>");
-	}
+	if (req.body.type !== "char") { res.status(307).setHeader("Location", "/api_v2/assets/imported"); return res.end(); }
+	else if (!req.body.themeId) { return res.status(400).end("1<error><code>malformed</code><message/></error>"); }
 	let themeId: string;
 	switch (req.body.themeId) {
-		case "custom":
-			themeId = "family";
-			break;
-		case "action":
-		case "animal":
-		case "space":
-		case "vietnam":
-			themeId = "cc2";
-			break;
-		default:
-			themeId = req.body.themeId;
+		case "custom": themeId = "family"; break;
+		case "action": case "animal": case "space": case "vietnam": themeId = "cc2"; break;
+		default: themeId = req.body.themeId;
 	}
 	const filters: Partial<Asset> = { themeId, type: "char" };
 	if (req.body.assetId && req.body.assetId !== "null") filters.id = req.body.assetId;
@@ -137,69 +96,44 @@ group.route("*", /^\/(assets|goapi\/getAsset)\/([\S]*)$/, (req, res) => {
 		res.writeHead(200, { "Content-Type": mime, "X-Content-Type-Options": "nosniff", "Cache-Control": "no-cache" });
 		const readStream = AssetModel.load(id, false);
 		readStream.pipe(res);
-	} catch (e) {
-		if (!res.writableEnded) res.status(404).end();
-	}
+	} catch (e) { if (!res.writableEnded) res.status(404).end(); }
 });
 group.route("POST", "/api_v2/asset/get", (req, res) => {
 	const id = req.body.data?.id ?? req.body.data?.starter_id;
-	if (!id) {
-		return res.status(404).json({ status: "error" });
-	}
+	if (!id) { return res.status(404).json({ status: "error" }); }
 	try {
 		const info = AssetModel.getInfo(id);
 		const extraInfo = { share: { type: "none" }, published: "" };
 		res.json({ status: "ok", data: Object.assign(info, extraInfo) });
 	} catch (e) {
-		if (e == "404") {
-			return res.status(404).json({ status: "error" });
-		}
+		if (e == "404") { return res.status(404).json({ status: "error" }); }
 		console.error(req.parsedUrl.pathname, "failed. Error:", e);
 		res.status(500).json({ status: "error" });
 	}
 });
 group.route("POST", "/goapi/getAssetTags/", (_, r) => r.json([]));
-group.route("POST", "/goapi/getLatestAssetId/", (_, r) => {
-	r.setHeader("Content-Type", "text/html");
-	r.end("0");
-});
+group.route("POST", "/goapi/getLatestAssetId/", (_, r) => { r.setHeader("Content-Type", "text/html"); r.end("0"); });
 group.route("POST", "/api_v2/asset/update/", (req, res) => {
 	const id = req.body.data?.id ?? req.body.data?.starter_id ?? null;
 	const title = req.body.data?.title ?? null;
 	const tags = req.body.data?.tags ?? null;
-	if (!id || title === null) {
-		return res.status(400).json({ status: "error" });
-	}
+	if (!id || title === null) { return res.status(400).json({ status: "error" }); }
 	const update: Partial<Asset> = { title: title };
-	if (req.body.data?.hasOwnProperty("tags")) {
-		if (tags && String(tags).trim() !== "") {
-			update.tags = tags;
-		} else {
-			update.tags = undefined;
-		}
-	}
-	try {
-		AssetModel.updateInfo(id, update);
-		res.json({ status: "ok" });
-	} catch (e) {
-		if (e == "404") {
-			return res.status(404).json({ status: "error" });
-		}
+	if (req.body.data?.hasOwnProperty("tags")) { if (tags && String(tags).trim() !== "") { update.tags = tags; } else { update.tags = undefined; } }
+	try { AssetModel.updateInfo(id, update); res.json({ status: "ok" }); }
+	catch (e) {
+		if (e == "404") { return res.status(404).json({ status: "error" }); }
 		console.error(req.parsedUrl.pathname, "failed. Error:", e);
 		res.status(500).json({ status: "error" });
 	}
 });
 group.route("POST", "/api/asset/upload", async (req, res) => {
 	const file = req.files.import;
-	if (typeof file === "undefined" || !req.body.type || !req.body.subtype) {
-		return res.status(400).json({ msg: "Missing required parameters" });
-	}
+	if (typeof file === "undefined" || !req.body.type || !req.body.subtype) { return res.status(400).json({ msg: "Missing required parameters" }); }
 	const { filepath } = file;
 	const filename = path.parse(file.originalFilename).name;
 	const ext = path.extname(file.originalFilename).slice(1).toLowerCase();
-	if (!ext) {
-		return res.status(400).json({ msg: "File type could not be determined" });
-	}
+	if (!ext) { return res.status(400).json({ msg: "File type could not be determined" }); }
 	const progressId = req.body.progressId || randomBytes(8).toString("hex");
 	uploadProgressMap.set(progressId, 0);
 	await smoothTo(progressId, 3, 300);
@@ -208,32 +142,19 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 	let stream: any;
 	let finalExt = ext;
 	const ok = info.subtype == "video" ? "video" : info.type;
-	if ((fileTypes[ok] || []).indexOf(ext) < 0) {
-		uploadProgressMap.delete(progressId);
-		return res.status(400).json({ msg: "Invalid file type" });
-	}
+	if ((fileTypes[ok] || []).indexOf(ext) < 0) { uploadProgressMap.delete(progressId); return res.status(400).json({ msg: "Invalid file type" }); }
 	if (ext !== "swf" && ["webp", "tif", "tiff", "avif"].includes(ext)) {
 		try {
 			await smoothTo(progressId, 8, 200);
 			await new Promise((resolve, reject) => {
-				const child = spawn(ffmpegPath, [ "-hide_banner", "-loglevel", "error", "-i", filepath, "-f", "image2pipe", "-vcodec", "png", "-" ]);
+				const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", filepath, "-f", "image2pipe", "-vcodec", "png", "-"]);
 				const chunks: Buffer[] = [];
 				child.stdout.on("data", (chunk) => chunks.push(chunk));
-				child.on("close", (code) => {
-					if (code === 0) { stream = Readable.from(Buffer.concat(chunks));
-						finalExt = "png";
-						resolve(true);
-					} else {
-						reject(new Error(`FFmpeg exit code ${code}`));
-					}
-				});
+				child.on("close", (code) => { if (code === 0) { stream = Readable.from(Buffer.concat(chunks)); finalExt = "png"; resolve(true); } else { reject(new Error(`FFmpeg exit code ${code}`)); } });
 				child.on("error", reject);
 			});
 			await smoothTo(progressId, 15, 250);
-		} catch {
-			uploadProgressMap.delete(progressId);
-			return res.status(500).json({ msg: "Conversion failed" });
-		}
+		} catch { uploadProgressMap.delete(progressId); return res.status(500).json({ msg: "Conversion failed" }); }
 	}
 	try {
 		await smoothTo(progressId, 10, 200);
@@ -242,17 +163,10 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 				if (finalExt != "swf") {
 					await smoothTo(progressId, 18, 200);
 					await new Promise((resolve, reject) => {
-						const child = spawn(ffmpegPath, [ "-hide_banner", "-loglevel", "error", "-i", filepath, "-vf", "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0", "-f", "image2pipe", "-vcodec", "png", "-" ]);
+						const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", filepath, "-vf", "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0", "-f", "image2pipe", "-vcodec", "png", "-"]);
 						const chunks: Buffer[] = [];
 						child.stdout.on("data", (chunk) => chunks.push(chunk));
-						child.on("close", (code) => {
-							if (code === 0) { stream = Readable.from(Buffer.concat(chunks));
-								finalExt = "png";
-								resolve(true);
-							} else {
-								reject(new Error(`FFmpeg exit code ${code}`));
-							}
-						});
+						child.on("close", (code) => { if (code === 0) { stream = Readable.from(Buffer.concat(chunks)); finalExt = "png"; resolve(true); } else { reject(new Error(`FFmpeg exit code ${code}`)); } });
 						child.on("error", reject);
 					});
 					await smoothTo(progressId, 70, 400);
@@ -266,33 +180,42 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 				break;
 			}
 			case "sound": {
-				await smoothTo(progressId, 15, 200);
-				const temppath = path.join( Directories.asset, `${randomBytes(16).toString("hex")}.mp3` );
-				const progressTimer = setInterval(() => {
-					const current = uploadProgressMap.get(progressId) ?? 15;
-					if (current < 55) { uploadProgressMap.set(progressId, current + 1); } }, 500);
-				const stopProgress = () => clearInterval(progressTimer);
-				const processAudio = async () => {
-					const soundStream = ext !== "mp3" ? await fileUtil.convertToMp3(filepath, ext) : fs.createReadStream(filepath);
-					const writeStream = fs.createWriteStream(temppath);
+				await smoothTo(progressId, 12, 200);
+				const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.mp3`);
+				if (ext != "mp3") {
+					const ffdata = await getMediaInfo(filepath);
+					const durationSec = parseFloat(ffdata.format?.duration || "1") || 1;
 					await new Promise<void>((resolve, reject) => {
-						const fail = (error: Error) => { soundStream.unpipe(writeStream); soundStream.destroy?.(); writeStream.destroy(); reject(error); };
-						soundStream.once("error", fail);
-						writeStream.once("error", fail);
-						writeStream.once("finish", resolve);
-						soundStream.pipe(writeStream);
+						const args = ["-hide_banner", "-loglevel", "error", "-progress", "pipe:2", "-y", "-i", filepath, "-vn", "-c:a", "libmp3lame", "-q:a", "2", temppath];
+						const child = spawn(ffmpegPath, args);
+						let lastPct = 12;
+						child.stderr.setEncoding("utf8");
+						child.stderr.on("data", (chunk: string) => {
+							const match = chunk.match(/out_time_ms=(\d+)/);
+							if (match) {
+								const currentSec = parseInt(match[1], 10) / 1_000_000;
+								const pct = Math.min(74, Math.round(12 + (currentSec / durationSec) * 62));
+								if (pct > lastPct) { lastPct = pct; uploadProgressMap.set(progressId, pct); }
+							}
+						});
+						child.on("close", (code) => { if (code === 0) { uploadProgressMap.set(progressId, 75); resolve(); } else { reject(new Error(`FFmpeg audio conversion failed with code ${code}`)); } });
+						child.on("error", reject);
 					});
-				};
-				await processAudio().then( () => stopProgress(), (error) => {
-					stopProgress();
-					throw error;
-					}
-				);
-				await smoothTo(progressId, 60, 250);
+				} else {
+					await new Promise((resolve, reject) => {
+						const read = fs.createReadStream(filepath);
+						const write = fs.createWriteStream(temppath);
+						read.pipe(write);
+						write.on("finish", resolve);
+						write.on("error", reject);
+						read.on("error", reject);
+					});
+					await smoothTo(progressId, 55, 300);
+				}
+				await smoothTo(progressId, 82, 250);
 				const ffdata = await getMediaInfo(temppath);
 				info.duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
-				await smoothTo(progressId, 78, 250);
-				await smoothTo(progressId, 90, 300);
+				await smoothTo(progressId, 90, 250);
 				info.id = await AssetModel.save(temppath, "mp3", info);
 				if (fs.existsSync(temppath)) fs.unlinkSync(temppath);
 				await smoothTo(progressId, 100, 400);
@@ -309,7 +232,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 					await smoothTo(progressId, 12, 200);
 					const durationSec = parseFloat(ffdata.format?.duration || "1") || 1;
 					await new Promise<void>((resolve, reject) => {
-						const args = [ "-hide_banner", "-loglevel", "error", "-progress", "pipe:2", "-y", "-i", filepath, "-vf", "scale=350:-2", "-c:v", "flv", "-q:v", "2", temppath ];
+						const args = ["-hide_banner", "-loglevel", "error", "-progress", "pipe:2", "-y", "-i", filepath, "-vf", "scale=350:-2", "-c:v", "flv", "-q:v", "2", temppath];
 						const child = spawn(ffmpegPath, args);
 						let lastPct = 12;
 						child.stderr.setEncoding("utf8");
@@ -318,20 +241,10 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 							if (match) {
 								const currentSec = parseInt(match[1], 10) / 1_000_000;
 								const pct = Math.min(81, Math.round(12 + (currentSec / durationSec) * 69));
-								if (pct > lastPct) {
-									lastPct = pct;
-									uploadProgressMap.set(progressId, pct);
-								}
+								if (pct > lastPct) { lastPct = pct; uploadProgressMap.set(progressId, pct); }
 							}
 						});
-						child.on("close", (code) => {
-							if (code === 0) {
-								uploadProgressMap.set(progressId, 82);
-								resolve();
-							} else {
-								reject(new Error(`FFmpeg video conversion failed with code ${code}`));
-							}
-						});
+						child.on("close", (code) => { if (code === 0) { uploadProgressMap.set(progressId, 82); resolve(); } else { reject(new Error(`FFmpeg video conversion failed with code ${code}`)); } });
 						child.on("error", reject);
 					});
 					await smoothTo(progressId, 90, 300);
@@ -340,7 +253,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 					await smoothTo(progressId, 95, 250);
 					const thumbPath = path.join(AssetModel.folder, info.id.slice(0, -3) + "png");
 					await new Promise<void>((resolve) => {
-						const child = spawn(ffmpegPath, [ "-hide_banner", "-loglevel", "error", "-y", "-ss", "00:00:00", "-i", filepath, "-frames:v", "1", thumbPath ]);
+						const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-y", "-ss", "00:00:00", "-i", filepath, "-frames:v", "1", thumbPath]);
 						child.on("close", () => resolve());
 						child.on("error", () => resolve());
 					});
@@ -349,12 +262,8 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 					let { ptype } = req.body;
 					info.ptype = ["placeable", "wearable", "holdable"].includes(ptype) ? ptype : "placeable";
 					await smoothTo(progressId, 22, 250);
-					if (!stream) {
-						stream = fs.createReadStream(filepath);
-					}
-					if (stream instanceof fs.ReadStream) {
-						stream.pause();
-					}
+					if (!stream) { stream = fs.createReadStream(filepath); }
+					if (stream instanceof fs.ReadStream) { stream.pause(); }
 					await smoothTo(progressId, 65, 350);
 					info.id = await AssetModel.save(stream, finalExt, info);
 					await smoothTo(progressId, 100, 400);
@@ -366,9 +275,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 				return res.status(400).json({ msg: "Invalid asset type" });
 			}
 		}
-		if (!uploadProgressMap.has(progressId) || (uploadProgressMap.get(progressId) ?? 0) < 100) {
-			uploadProgressMap.set(progressId, 100);
-		}
+		if (!uploadProgressMap.has(progressId) || (uploadProgressMap.get(progressId) ?? 0) < 100) { uploadProgressMap.set(progressId, 100); }
 		setTimeout(() => uploadProgressMap.delete(progressId), 5000);
 		res.json(info);
 	} catch (e) {
@@ -390,9 +297,7 @@ group.route("POST", "/goapi/saveSound/", async (req, res) => {
 	} else {
 		filepath = req.files.Filedata.filepath;
 		ext = path.extname(req.files.Filedata.originalFilename || filepath).slice(1).toLowerCase();
-		if (!ext) {
-			return res.status(400).json({ msg: "File type could not be determined" });
-		}
+		if (!ext) { return res.status(400).json({ msg: "File type could not be determined" }); }
 	}
 	const info: Partial<Asset> = { type: "sound", subtype: req.body.subtype, title: req.body.title };
 	try {
@@ -402,9 +307,7 @@ group.route("POST", "/goapi/saveSound/", async (req, res) => {
 			const temppath = path.join(Directories.asset, `${randomBytes(16).toString("hex")}.mp3`);
 			tempToUnlink = temppath;
 			const writeStream = fs.createWriteStream(temppath);
-			await new Promise((resolve, reject) => {
-				stream.pipe(writeStream).on("finish", resolve).on("error", reject);
-			});
+			await new Promise((resolve, reject) => { stream.pipe(writeStream).on("finish", resolve).on("error", reject); });
 			if (isRecord && fs.existsSync(filepath)) fs.unlinkSync(filepath);
 			filepath = temppath;
 		}
@@ -412,13 +315,9 @@ group.route("POST", "/goapi/saveSound/", async (req, res) => {
 		const duration = Math.floor(parseFloat(ffdata.format.duration) * 1e3);
 		const meta = { duration, type: "sound", subtype: info.subtype || "Voiceover", title: info.title || "Microphone recording" };
 		const id = await AssetModel.save(filepath, "mp3", meta);
-		if (tempToUnlink && fs.existsSync(tempToUnlink)) {
-			fs.unlinkSync(tempToUnlink);
-		}
-		if (isRecord && ext == "mp3" && fs.existsSync(filepath)) {
-			fs.unlinkSync(filepath);
-		}
-		const safeTitle = (meta.title || "") .replace(/&/g, "&amp;") .replace(/</g, "&lt;") .replace(/>/g, "&gt;");
+		if (tempToUnlink && fs.existsSync(tempToUnlink)) { fs.unlinkSync(tempToUnlink); }
+		if (isRecord && ext == "mp3" && fs.existsSync(filepath)) { fs.unlinkSync(filepath); }
+		const safeTitle = (meta.title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		const responseXml = `<asset><id>${id}</id><enc_asset_id>${id}</enc_asset_id><type>sound</type><subtype>voiceover</subtype><title>${safeTitle}</title><published>1</published><tags>speech</tags><duration>${duration}</duration><downloadtype>progressive</downloadtype><file>${id}</file></asset>`;
 		res.setHeader("Content-Type", "text/html; charset=UTF-8");
 		res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
