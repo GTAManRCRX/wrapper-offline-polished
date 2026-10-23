@@ -1,5 +1,5 @@
 const env = Object.assign(process.env, require("../../env.json"), require("../../config.json"));
-import { app, BrowserWindow, Menu, shell, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, Menu, shell, ipcMain, dialog, screen } from "electron";
 import { createWriteStream } from "fs";
 import Directories from "./storage/directories";
 import { join } from "path";
@@ -14,9 +14,7 @@ app.setPath("userData", customTempPath);
 	try {
 		const appName = app.getName(); 
 		const defaultPath = join(app.getPath("appData"), appName);
-
-		if (existsSync(defaultPath) && defaultPath !== customTempPath) {
-			rmdirSync(defaultPath, { recursive: true });
+		if (existsSync(defaultPath) && defaultPath !== customTempPath) { rmdirSync(defaultPath, { recursive: true });
 			console.log(`\n${appName} default temp folder removed successfully`);
 		}
 	} catch (e: any) {
@@ -26,16 +24,8 @@ app.setPath("userData", customTempPath);
 const IS_DEV = app.commandLine.getSwitchValue("dev").length > 0;
 startAll();
 const PRELOAD_SOURCE = `const { contextBridge, ipcRenderer } = require("electron");
-contextBridge.exposeInMainWorld("appWindow", {
-	goHome: () => ipcRenderer.send("go-home"),
-	openDiscord: () => ipcRenderer.send("open-discord"),
-	openFAQ: () => ipcRenderer.send("open-faq"),
-	openGitHub: () => ipcRenderer.send("open-github"),
-	openDataFolder: () => ipcRenderer.send("open-data-folder"),
-	confirmQuit: (message, subtext) => ipcRenderer.invoke("show-quit-dialog", message, subtext),
-});`;
-const getPreloadPath = () => {
-    const localPath = join(__dirname, "preload.js");
+contextBridge.exposeInMainWorld("appWindow", { goHome: () => ipcRenderer.send("go-home"), openDiscord: () => ipcRenderer.send("open-discord"), openFAQ: () => ipcRenderer.send("open-faq"), openGitHub: () => ipcRenderer.send("open-github"), openDataFolder: () => ipcRenderer.send("open-data-folder"), confirmQuit: (message, subtext) => ipcRenderer.invoke("show-quit-dialog", message, subtext), });`;
+const getPreloadPath = () => { const localPath = join(__dirname, "preload.js");
     if (existsSync(localPath)) return localPath;
     return join(__dirname, "preload.js");
 };
@@ -44,59 +34,21 @@ writeFileSync(preloadPath, PRELOAD_SOURCE, "utf8");
 if (settings.saveLogFiles) {
 	const filePath = join(Directories.log, new Date().valueOf() + ".txt");
 	const writeStream = createWriteStream(filePath);
-	console.log = console.error = console.warn = function (c) {
-		writeStream.write(c + "\n");
-		process.stdout.write(c + "\n");
-	};
-	process.on("exit", () => {
-		console.log("Exiting");
-		writeStream.close();
-	});
+	console.log = console.error = console.warn = function (c) { writeStream.write(c + "\n"); process.stdout.write(c + "\n"); };
+	process.on("exit", () => { console.log("Exiting"); writeStream.close(); });
 }
 let pluginName:string;
-switch (process.platform) {
-	case "win32": {
-		pluginName = "extensions/pepflashplayer.dll";
-		break;
-	}
-	case "darwin": {
-		pluginName = "extensions/PepperFlashPlayer.plugin";
-		break;
-	}
-	case "linux": {
-		pluginName = "extensions/libpepflashplayer.so";
-		app.commandLine.appendSwitch("no-sandbox");
-		break;
-	}
-	default: {
-		throw new Error("You are running Wrapper offline on an unsupported platform");
-	}
-}
-app.commandLine.appendSwitch("ppapi-flash-path", join(__dirname, pluginName));
-app.commandLine.appendSwitch("ppapi-flash-version", "34.0.0.118");
-app.commandLine.appendSwitch("disable-http-cache");
+switch (process.platform) { case "win32": { pluginName = "extensions/pepflashplayer.dll"; break; } case "darwin": { pluginName = "extensions/PepperFlashPlayer.plugin"; break; } case "linux": { pluginName = "extensions/libpepflashplayer.so"; app.commandLine.appendSwitch("no-sandbox"); break; } default: { throw new Error("You are running Wrapper offline on an unsupported platform"); } }
+app.commandLine.appendSwitch("ppapi-flash-path", join(__dirname, pluginName)); app.commandLine.appendSwitch("ppapi-flash-version", "34.0.0.118"); app.commandLine.appendSwitch("disable-http-cache");
 let mainWindow:BrowserWindow;
 let root:string;
-const createWindow = () => {
-	let iconPath: string;
+const createWindow = () => { let iconPath: string;
 	if (process.platform === 'win32') {iconPath = join(__dirname, 'favicon.ico');} else if (process.platform === 'darwin') {iconPath = join(__dirname, 'favicon.icns');} else {iconPath = join(__dirname, 'favicon.png');}
-	mainWindow = new BrowserWindow({
-		width: 1280,
-		height: 720,
-		title: "Wrapper offline",
-		autoHideMenuBar: true,
-		show: false,
-		icon: iconPath,
-		webPreferences: {
-			preload: getPreloadPath(),
-			plugins: true,
-			contextIsolation: true
-		}
-	});
+	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+	mainWindow = new BrowserWindow({ width: width, height: height, title: "Wrapper offline", autoHideMenuBar: true, show: false, icon: iconPath, webPreferences: { preload: getPreloadPath(), plugins: true, contextIsolation: true } });
     ipcMain.handle("show-quit-dialog", async (event, message, subtext) => {
     const displayMsg = message || "Are you sure you want to exit the LVM?";
-    const displaySub = subtext || "Unsaved changes will be lost";
-    let iconPath: string;
+    const displaySub = subtext || "Unsaved changes will be lost"; let iconPath: string;
 	if (process.platform === 'win32') {iconPath = join(__dirname, 'favicon.ico');} else if (process.platform === 'darwin') {iconPath = join(__dirname, 'favicon.icns');} else {iconPath = join(__dirname, 'favicon.png');}
     const innerIconPath = (process.platform === 'darwin' || process.platform === 'linux') ? join(__dirname, 'favicon.png') : join(__dirname, 'favicon.ico');
     let iconDataUrl = "";
@@ -107,32 +59,10 @@ const createWindow = () => {
     } catch (e) {
         console.log("Could not load icon, using fallback");
     }
-    let confirmWin = new BrowserWindow({
-        width: 500,
-        height: 150,
-        parent: mainWindow,
-        modal: true,
-        icon: iconPath,
-        title: "Wrapper offline",
-        resizable: false,
-        autoHideMenuBar: true,
-        show: false,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    });
-    let result = false;
-    const handleResponse = (event, response) => {
-        result = response;
-        confirmWin.close();
-    };
+    let confirmWin = new BrowserWindow({ width: 500, height: 150, parent: mainWindow, modal: true, icon: iconPath, title: "Wrapper offline", resizable: false, autoHideMenuBar: true, show: false, webPreferences: { nodeIntegration: true, contextIsolation: false } }); let result = false;
+    const handleResponse = (event, response) => { result = response; confirmWin.close(); };
     ipcMain.once("confirm-response", handleResponse);
-    setTimeout(() => {
-        if (!confirmWin.isDestroyed()) {
-            confirmWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`);
-            confirmWin.show();
-        }
+    setTimeout(() => { if (!confirmWin.isDestroyed()) { confirmWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`); confirmWin.show(); }
     }, 150);
         const htmlContent = `
         <!DOCTYPE html>
@@ -220,21 +150,9 @@ const createWindow = () => {
         </html>
     `;
     confirmWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`);
-    return new Promise((resolve) => {
-        confirmWin.on('closed', () => {
-            ipcMain.removeListener("confirm-response", handleResponse);
-            resolve(result);
-        });
-    });
+    return new Promise((resolve) => { confirmWin.on('closed', () => { ipcMain.removeListener("confirm-response", handleResponse); resolve(result); }); });
 });
-	ipcMain.on("exit", () => process.exit(0));
-	ipcMain.on("open-discord", openDiscord);
-	ipcMain.on("open-faq", openFaq);
-	ipcMain.on("open-github", openGitHub);
-	ipcMain.on("open-data-folder", openDataFolder);
-	ipcMain.on("go-home", () => {
-    mainWindow.loadURL(root);
-    });
+	ipcMain.on("exit", () => process.exit(0)); ipcMain.on("open-discord", openDiscord); ipcMain.on("open-faq", openFaq); ipcMain.on("open-github", openGitHub); ipcMain.on("open-data-folder", openDataFolder); ipcMain.on("go-home", () => { mainWindow.loadURL(root); });
 	let host:string, port:string;
 	if (IS_DEV) {
 		host = app.commandLine.getSwitchValue("host");
@@ -245,87 +163,12 @@ const createWindow = () => {
 	}
 	root = `${host}:${port}`;
 	mainWindow.loadURL(root);
-	mainWindow.once("ready-to-show", () => {
-		mainWindow.maximize();
-		mainWindow.show();
-	});
+	mainWindow.once("ready-to-show", () => { mainWindow.maximize(); mainWindow.show(); });
 	mainWindow.on("closed", () => process.exit(0));
 };
-async function openDiscord() {
-	await shell.openExternal("https://discord.gg/Kf7BzSw");
-}
-async function openFaq() {
-	await shell.openExternal("https://github.com/wrapper-offline/wrapper-offline/wiki/FAQ");
-}
-async function openGitHub() {
-	await shell.openExternal("https://github.com/GTAManRCRX/wrapper-offline-fixed");
-}
-async function openDataFolder() {
-	await shell.openPath(Directories.userData);
-}
-app.whenReady().then(() => {
-	setTimeout(createWindow, 2000);
-
-	app.on("activate", () => {
-		if (BrowserWindow.getAllWindows().length === 0) {
-			createWindow();
-		}
-	});
-});
-app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") app.quit();
-});
-function setMenuBar(mainWindow:BrowserWindow) {
-	mainWindow.setAutoHideMenuBar(settings.hideNavbar);
-	Menu.setApplicationMenu(Menu.buildFromTemplate([
-		{
-			label: "Home",
-			click: () => {
-				mainWindow.loadURL(root);
-			}
-		},
-		{
-			label: "View",
-			submenu: [
-				{ type: "separator" },
-				{ role: "zoomIn" },
-				{ role: "zoomOut" },
-				{ role: "resetZoom" },
-				{ type: "separator" },
-				{ role: "toggleDevTools" },
-				{ role: "reload" },
-				{ role: "forceReload" },
-				{ type: "separator" },
-				{ role: "minimize" },
-				...(process.platform == "darwin" ? 
-					[
-						{ role: "front" },
-						{ type: "separator" },
-						{ role: "window" }
-					] as ({ role: "front" } |
-						{ type: "separator" } |
-						{ role: "window" })[] : 
-					[
-						{ role: "close" } as { role: "close" }
-					]),
-			]
-		},
-		{
-			role: "help",
-			submenu: [
-				{
-					label: "Discord",
-					click: openDiscord
-				},
-				{
-					label: "FAQ",
-					click: openFaq
-				},
-				{
-					label: "GitHub",
-					click: openGitHub
-				}
-			]
-		}
-	]));
-}
+async function openDiscord() { await shell.openExternal("https://discord.gg/Kf7BzSw"); }
+async function openFaq() { await shell.openExternal("https://github.com/wrapper-offline/wrapper-offline/wiki/FAQ"); }
+async function openGitHub() { await shell.openExternal("https://github.com/GTAManRCRX/wrapper-offline-fixed"); }
+async function openDataFolder() { await shell.openPath(Directories.userData); }
+app.whenReady().then(() => { setTimeout(createWindow, 2000); app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) { createWindow(); } }); });
+app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
