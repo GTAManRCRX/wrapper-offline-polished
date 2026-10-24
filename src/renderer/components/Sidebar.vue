@@ -468,12 +468,6 @@ defineExpose({ slideMode, width });
             <div class="link_text">FAQ</div>
         </a>
     </li>
-    <li class="link" title="Need help?">
-        <a href="javascript:window.appWindow.openDiscord();">
-            <i class="ico speech"></i>
-            <div class="link_text">Discord</div>
-        </a>
-    </li>
     <li class="link" title="Configure">
         <button @click="openSettings">
             <i class="ico cog"></i>

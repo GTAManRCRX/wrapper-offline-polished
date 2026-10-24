@@ -24,7 +24,7 @@ app.setPath("userData", customTempPath);
 const IS_DEV = app.commandLine.getSwitchValue("dev").length > 0;
 startAll();
 const PRELOAD_SOURCE = `const { contextBridge, ipcRenderer } = require("electron");
-contextBridge.exposeInMainWorld("appWindow", { goHome: () => ipcRenderer.send("go-home"), openDiscord: () => ipcRenderer.send("open-discord"), openFAQ: () => ipcRenderer.send("open-faq"), openGitHub: () => ipcRenderer.send("open-github"), openDataFolder: () => ipcRenderer.send("open-data-folder"), confirmQuit: (message, subtext) => ipcRenderer.invoke("show-quit-dialog", message, subtext), });`;
+contextBridge.exposeInMainWorld("appWindow", { goHome: () => ipcRenderer.send("go-home"), openFAQ: () => ipcRenderer.send("open-faq"), openGitHub: () => ipcRenderer.send("open-github"), openDataFolder: () => ipcRenderer.send("open-data-folder"), confirmQuit: (message, subtext) => ipcRenderer.invoke("show-quit-dialog", message, subtext), });`;
 const getPreloadPath = () => { const localPath = join(__dirname, "preload.js");
     if (existsSync(localPath)) return localPath;
     return join(__dirname, "preload.js");
@@ -152,7 +152,7 @@ const createWindow = () => { let iconPath: string;
     confirmWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`);
     return new Promise((resolve) => { confirmWin.on('closed', () => { ipcMain.removeListener("confirm-response", handleResponse); resolve(result); }); });
 });
-	ipcMain.on("exit", () => process.exit(0)); ipcMain.on("open-discord", openDiscord); ipcMain.on("open-faq", openFaq); ipcMain.on("open-github", openGitHub); ipcMain.on("open-data-folder", openDataFolder); ipcMain.on("go-home", () => { mainWindow.loadURL(root); });
+	ipcMain.on("exit", () => process.exit(0)); ipcMain.on("open-faq", openFaq); ipcMain.on("open-github", openGitHub); ipcMain.on("open-data-folder", openDataFolder); ipcMain.on("go-home", () => { mainWindow.loadURL(root); });
 	let host:string, port:string;
 	if (IS_DEV) {
 		host = app.commandLine.getSwitchValue("host");
@@ -166,7 +166,6 @@ const createWindow = () => { let iconPath: string;
 	mainWindow.once("ready-to-show", () => { mainWindow.maximize(); mainWindow.show(); });
 	mainWindow.on("closed", () => process.exit(0));
 };
-async function openDiscord() { await shell.openExternal("https://discord.gg/Kf7BzSw"); }
 async function openFaq() { await shell.openExternal("https://github.com/wrapper-offline/wrapper-offline/wiki/FAQ"); }
 async function openGitHub() { await shell.openExternal("https://github.com/GTAManRCRX/wrapper-offline-fixed"); }
 async function openDataFolder() { await shell.openPath(Directories.userData); }
