@@ -8,7 +8,7 @@ Wrapper offline is a software designed to provide readily obtainable, irrevocabl
 It achieves this by replicating the original API and asset servers entirely on the computers of the users while providing a simplistic frontend to interact with them
 This project is important for archival purposes, as the ability to use the legacy GoAnimate editor and themes would be far trickier without it
 
-### Wrapper offline 2.1.1 - The ultimate bugfix
+### Wrapper offline 2.1.1 - Polished edition
 This version is a complete overhaul of the original 2.1.0 source code. Over 40+ critical bugs have been fixed, unnecessary dependencies removed, and the core packages swapped for maximum compatibility and portability
 ### Major architectural changes
 - Sharp → FFmpeg migration: Replaced the binary-heavy Sharp with FFmpeg as that is a Wrapper offline dependency anyways. This enables 100% native Windows 7 support without needing VxKex or any kernel extensions
