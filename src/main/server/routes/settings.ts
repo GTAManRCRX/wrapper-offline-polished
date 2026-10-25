@@ -3,21 +3,12 @@ import https from "https";
 import Settings from "../../storage/settings";
 
 const group = new httpz.Group();
-group.route("GET", "/api/settings/list", (req, res) => {
-	res.log("Retrieving settings...");
-	res.json(Settings.getAllSettings());
-	res.log("Success!");
-});
+group.route("GET", "/api/settings/list", (req, res) => { res.log("Retrieving settings..."); res.json(Settings.getAllSettings()); res.log("Success!"); });
 group.route("POST", "/api/settings/update", (req, res) => {
 	const name:string = req.body.setting;
-	if (!name) {
-		return res.status(400).json({msg:"Expected parameter 'setting' on the request body."});
-	}
-	if (!req.body.value) {
-		return res.status(400).json({msg:"Expected parameter 'value' on the request body."});
-	}
-	const value:string|boolean = req.body.value == "true" ? true : 
-		req.body.value == "false" ? false : req.body.value;
+	if (!name) { return res.status(400).json({msg:"Expected parameter 'setting' on the request body."}); }
+	if (!req.body.value) { return res.status(400).json({msg:"Expected parameter 'value' on the request body."}); }
+	const value:string|boolean = req.body.value == "true" ? true :  req.body.value == "false" ? false : req.body.value;
 	if (typeof Settings[name] == "undefined" || name == "getAllSettings") {
 		console.warn(`r.settings: Attempted #update on invalid setting '${name}'.`);
 		return res.status(400).json({msg:`Expected parameter 'value' for setting '${name}' to have type '${typeof Settings[name]}'.`});
@@ -27,7 +18,6 @@ group.route("POST", "/api/settings/update", (req, res) => {
 		return res.status(400).json({msg:`Expected parameter 'value' for setting '${name}' to have type '${typeof Settings[name]}'.`});
 	}
 	Settings[name] = value;
-
 	res.end();
 });
 group.route("GET", "/api/settings/get_updates", (req, res) => {
@@ -38,10 +28,8 @@ group.route("GET", "/api/settings/get_updates", (req, res) => {
 	https.get(
 		{
 			host: "api.github.com",
-			path: "/repos/GTAManRCRX/wrapper-offline-fixed/releases",
-			headers: {
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0"
-			}
+			path: "/repos/GTAManRCRX/wrapper-offline-polished/releases",
+			headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0" }
 		},
 		(res2) => {
 			let buffers = [];

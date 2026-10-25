@@ -167,7 +167,7 @@ const createWindow = () => { let iconPath: string;
 	mainWindow.on("closed", () => process.exit(0));
 };
 async function openFaq() { await shell.openExternal("https://github.com/wrapper-offline/wrapper-offline/wiki/FAQ"); }
-async function openGitHub() { await shell.openExternal("https://github.com/GTAManRCRX/wrapper-offline-fixed"); }
+async function openGitHub() { await shell.openExternal("https://github.com/GTAManRCRX/wrapper-offline-polished"); }
 async function openDataFolder() { await shell.openPath(Directories.userData); }
 app.whenReady().then(() => { setTimeout(createWindow, 2000); app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) { createWindow(); } }); });
 app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
