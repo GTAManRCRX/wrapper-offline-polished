@@ -26,7 +26,7 @@ This version is a complete overhaul of the original 2.1.0 source code. Over 40+ 
 - Native x86 support: First-ever stable build for Windows x86 and Linux x86 architectures
 - Flash 34 integration: Upgraded to Clean Flash 34.0.0.118 (from 32.0.0.371) for better stability and performance
 - Dependency purge: Removed heavy and unnecessary tools to reduce package size and overhead
-- FFprobe upgrade: Updated from 1.4.1 to 2.1.2 for better asset handling
+- FFprobe upgrade: Updated from 1.4.1 ffprobe-static 3.0.1
 ### UI polish:
 - Responsive settings panel with rounded corners, that look nice even on small screens
 - Dark mode is now the default
@@ -41,7 +41,7 @@ This version is a complete overhaul of the original 2.1.0 source code. Over 40+ 
 This version is built for longevity and stability. It runs on Windows 7 natively, consumes fewer resources, and fixes the most annoying bugs that occured in the previous Wrapper offline versions
 
 ### Downloads / Installation
-To install Wrapper offline, you need to download it through the [releases page](https://github.com/GTAManRCRX/wrapper-offline-tub/releases/)
+To install Wrapper offline, you need to download it through the [releases page](https://github.com/GTAManRCRX/wrapper-offline-polished/releases/tag/2.1.1)
 
 ### Updates and support
 For support, the first thing you should do is to [read through the Wrapper offline wiki](https://github.com/wrapper-offline/wrapper-offline/wiki) as it most likely has what you want to know
