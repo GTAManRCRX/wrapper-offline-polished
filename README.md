@@ -26,7 +26,7 @@ This version is a complete overhaul of the original 2.1.0 source code. Over 40+ 
 - Native x86 support: First-ever stable build for Windows x86 and Linux x86 architectures
 - Flash 34 integration: Upgraded to Clean Flash 34.0.0.118 (from 32.0.0.371) for better stability and performance
 - Dependency purge: Removed heavy and unnecessary tools to reduce package size and overhead
-- FFprobe upgrade: Updated from 1.4.1 ffprobe-static 3.0.1
+- FFprobe upgrade: Updated from 1.4.1 to ffprobe-static 3.0.1
 ### UI polish:
 - Responsive settings panel with rounded corners, that look nice even on small screens
 - Dark mode is now the default
