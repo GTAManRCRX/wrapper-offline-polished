@@ -1,11 +1,11 @@
 import fs from "fs";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import Database from "../../storage/database";
 import MovieModel, { Movie } from "../models/movie";
 import { zipSync, unzipSync } from "fflate";
 import fileUtil from "../utils/fileUtil";
 
-const group = new httpz.Group();
+const group = new Group();
 group.route("*", /\/videomaker\/full\/(\w+)\/tutorial$/, (req, res) => {
 	const theme = req.matches[1];
 	res.redirect(`/go_full?tray=${theme}&tutorial=0`);

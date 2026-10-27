@@ -2,7 +2,7 @@ import { Char } from "../models/char.ts";
 import CharModel from "../models/char.ts";
 import Database from "../../storage/database";
 import fs from "fs";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import path from "path";
 
 const base = Buffer.alloc(1, "0");
@@ -13,7 +13,7 @@ const defaultTypes = {
 };
 
 const thumbUrl = process.env.THUMB_BASE_URL;
-const group = new httpz.Group();
+const group = new Group();
 
 group.route("GET", "/api/char/list", (req, res) => {
 	res.log("Retrieving character list...")

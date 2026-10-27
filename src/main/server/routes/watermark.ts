@@ -1,7 +1,7 @@
 import { createReadStream, ReadStream } from "fs";
 import Database from "../../storage/database";
 import fileTypes from "../data/allowed_file_types.json";
-import { Group } from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import { Readable } from "stream";
 import { spawn } from "child_process";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";

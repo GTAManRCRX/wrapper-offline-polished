@@ -1,7 +1,7 @@
 import AssetModel, { Asset } from "../models/asset";
 import Directories from "../../storage/directories";
 import fs from "fs";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import info from "../data/voices.json";
 import path from "path";
 import processVoice from "../models/tts";
@@ -10,7 +10,7 @@ import { Readable } from "stream";
 import { spawn } from "child_process";
 import ffprobePathObj from "ffprobe-static";
 
-const group = new httpz.Group();
+const group = new Group();
 const voices = info.voices, langs = {};
 
 const ffprobePath = (ffprobePathObj as any).path;

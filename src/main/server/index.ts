@@ -1,5 +1,5 @@
 import http from "http";
-import httpz from "@octanuary/httpz";
+import { AppServer } from "./miniHttp";
 import reqBody from "./middlewares/req.body";
 import resLog from "./middlewares/res.log";
 import routes from "./routes/index";
@@ -11,7 +11,7 @@ export function startAll() {
 };
 
 export function startAPIServer() {
-	const server = new httpz.Server();
+	const server = new AppServer();
 	server.add(reqBody);
 	server.add(resLog);
 	server.add(routes);

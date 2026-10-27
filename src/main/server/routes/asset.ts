@@ -4,7 +4,7 @@ import Directories from "../../storage/directories";
 import fileTypes from "../data/allowed_file_types.json";
 import fileUtil from "../utils/fileUtil";
 import fs from "fs";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import MovieModel from "../models/movie";
 import path from "path";
 import { randomBytes } from "crypto";
@@ -14,7 +14,7 @@ import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import ffprobePathObj from "ffprobe-static";
 
 const ffprobePath = (ffprobePathObj as any).path;
-const group = new httpz.Group();
+const group = new Group();
 const uploadProgressMap = new Map<string, number>();
 
 function getMediaInfo(filepath: string): Promise<any> {

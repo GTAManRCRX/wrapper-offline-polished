@@ -2,7 +2,7 @@ import Directories from "../../storage/directories";
 import fileUtil from "../utils/fileUtil.js";
 import fs from "fs";
 import http from "http";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import { join } from "path";
 import settings from "../../storage/settings";
 
@@ -10,7 +10,7 @@ const STATIC_SERVER_HOST = process.env.STATIC_SERVER_HOST;
 const STATIC_SERVER_PORT = process.env.STATIC_SERVER_PORT;
 const STORE_URL = process.env.STORE_URL;
 const THEME_FOLDER = Directories.store;
-const group = new httpz.Group();
+const group = new Group();
 function parseThemeList() {
 	const { truncatedThemeList } = settings;
 	const xmlPath = join(

@@ -1,8 +1,8 @@
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import https from "https";
 import Settings from "../../storage/settings";
 
-const group = new httpz.Group();
+const group = new Group();
 group.route("GET", "/api/settings/list", (req, res) => { res.log("Retrieving settings..."); res.json(Settings.getAllSettings()); res.log("Success!"); });
 group.route("POST", "/api/settings/update", (req, res) => {
 	const name:string = req.body.setting;

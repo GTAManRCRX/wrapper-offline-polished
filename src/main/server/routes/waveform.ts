@@ -1,11 +1,11 @@
 import Directories from "../../storage/directories";
 import fs from "fs";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import path from "path";
 import Settings from "../../storage/settings";
 import WfModel from "../models/waveform";
 
-const group = new httpz.Group();
+const group = new Group();
 
 group.route("POST", "/goapi/getWaveform/", async (req, res) => {
 	const SHOW_WAVEFORMS = Settings.showWaveforms;

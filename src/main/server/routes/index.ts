@@ -1,5 +1,5 @@
 import { app } from "electron";
-import httpz from "@octanuary/httpz";
+import { Group } from "../miniHttp";
 import { join, normalize, extname } from "path";
 import { createReadStream, existsSync, statSync } from "fs";
 import asset from "./asset";
@@ -12,7 +12,7 @@ import watermark from "./watermark";
 import waveform from "./waveform";
 
 const IS_DEV = app.commandLine.getSwitchValue("dev").length > 0;
-const group = new httpz.Group();
+const group = new Group();
 
 group.add(asset);
 group.add(char);
