@@ -30,25 +30,17 @@ group.route("*", /\/file\/movie\/thumb\/([^/]+)$/, (req, res) => {
 });
 group.route("GET", "/api/movie/get_info", (req, res) => {
 	const id = req.query.id;
-	if (!id) {
-		return res.status(400).json({ msg: "Movie ID missing" });
-	}
+	if (!id) { return res.status(400).json({ msg: "Movie ID missing" }); }
 	const movie = Database.get("movies", id);
-	if (movie) {
-		return res.json(movie.data);
-	}
+	if (movie) { return res.json(movie.data); }
 	const starters = Database.select("assets", { id, type: "movie" });
-	if (starters.length > 0) {
-		return res.json(starters[0]);
-	}
+	if (starters.length > 0) { return res.json(starters[0]); }
 	res.status(404).json({ msg: "Movie not found" });
 });
 group.route("GET", "/api/movie/list", (req, res) => {
 	const type = req.query.type;
 	const basePath = req.query.path;
-	if (!type) {
-		return res.status(400).json({ msg: "Expected type parameter" });
-	}
+	if (!type) { return res.status(400).json({ msg: "Expected type parameter" }); }
 	let movies: Movie[];
 	switch (type) {
 		case "starter":
@@ -59,12 +51,8 @@ group.route("GET", "/api/movie/list", (req, res) => {
 			const dbRes = Database.select("movies");
 			movies = Array.isArray(dbRes) ? dbRes : [];
 	}
-	movies = (movies || []).filter((m) => {
-		return basePath ? m.parent_id == basePath : !m.parent_id;
-	});
-	const folders = Database.select("movie_folders", {
-		parent_id: basePath ? basePath : "/",
-	});
+	movies = (movies || []).filter((m) => { return basePath ? m.parent_id == basePath : !m.parent_id; });
+	const folders = Database.select("movie_folders", { parent_id: basePath ? basePath : "/", });
 	let folderPath = [];
 	if (basePath) {
 		let rootFound = false;
@@ -81,14 +69,8 @@ group.route("GET", "/api/movie/list", (req, res) => {
 			}
 			const folder = dbRes.data;
 			currentId = folder.parent_id;
-			if (currentId == "/") {
-				rootFound = true;
-				currentId = null;
-			}
-			folderPath.unshift({
-				id: folder.id,
-				title: folder.title,
-			});
+			if (currentId == "/") { rootFound = true; currentId = null; }
+			folderPath.unshift({ id: folder.id, title: folder.title, });
 		}
 	}
 	res.json({ folder_path: folderPath, folders, movies });
@@ -120,13 +102,7 @@ group.route("POST", "/api/movie/move_selection", (req, res) => {
 		return res.status(400).json({ msg: "A required parameter is missing" });
 	}
 	try {
-		MovieModel.moveToFolder(
-			{
-				movieIds: movies || [],
-				movieFolderIds: movieFolders || [],
-			},
-			newParentId
-		);
+		MovieModel.moveToFolder( { movieIds: movies || [], movieFolderIds: movieFolders || [], }, newParentId );
 		res.json({ status: "ok" });
 	} catch (e) {
 		switch (e) {
@@ -148,8 +124,7 @@ group.route("GET", "/api/movie/delete_folder", (req, res) => {
 	if (!path) {
 		return res.status(400).json({ msg: "Expected path parameter" });
 	}
-	try {
-		MovieModel.deleteFolder(path);
+	try { MovieModel.deleteFolder(path);
 		res.json({ status: "ok" });
 	} catch (e) {
 		if (e == "404") {
@@ -166,8 +141,7 @@ group.route("POST", "/api/movie/delete", async (req, res) => {
 	}
 	const ids = idField.split(",");
 	for (const id of ids) {
-		try {
-			await MovieModel.delete(id);
+		try { await MovieModel.delete(id);
 			res.log("Deleted movie " + id);
 		} catch (err) {
 			if (err == "404") {
@@ -191,8 +165,7 @@ group.route("POST", "/api/movie/upload", async (req, res) => {
 	const charPath = file.filepath;
 	const buffer = fs.readFileSync(charPath);
 	const isZip = buffer.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
-	if (!isZip) {
-		if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
+	if (!isZip) { if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
 		console.error("Movie import blocked: Not a Wrapper offline video");
 		return res.status(400).json({ msg: "The file is invalid" });
 	}
@@ -200,24 +173,28 @@ group.route("POST", "/api/movie/upload", async (req, res) => {
 		const files = unzipSync(new Uint8Array(buffer));
 		const hasUgc = "ugc.xml" in files;
 		const hasMovie = "movie.xml" in files;
-		if (!hasUgc || !hasMovie) {
+		const hasBusiness = "business.xml" in files;
+		if (hasBusiness) {
+			if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
+			console.error("Movie import blocked: Business videos are not supported");
+		} 
+		else if (!hasUgc || !hasMovie) {
 			if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
 			console.error(`Movie import blocked: Missing required XMLs (ugc: ${hasUgc}, movie: ${hasMovie})`);
-			return res.status(400).json({ msg: "Invalid project file, there is no ugc.xml inside the ZIP" });
 		}
-		const id = await MovieModel.upload(buffer, isStarter);
-		if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
-		console.log(`[Success] Movie imported: ${id}`);
-		res.json({ status: "Movie imported successfully", id: id });
+		else {
+			const id = await MovieModel.upload(buffer, isStarter);
+			if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
+			console.log(`[Success] Movie imported: ${id}`);
+			res.json({ status: "Movie imported successfully", id: id });
+		}
 	} catch (err) {
 		console.error("Movie import error:", err);
 		if (fs.existsSync(charPath)) fs.unlinkSync(charPath);
 		res.status(500).json({ msg: "An error happened during video importation" });
 	}
 });
-group.route(
-	"*",
-	/^\/file\/movie\/file\/([^/]+)|\/goapi\/getMovie\/$/,
+group.route( "*", /^\/file\/movie\/file\/([^/]+)|\/goapi\/getMovie\/$/,
 	async (req, res) => {
 		const isPost = req.method == "POST";
 		const idField = isPost ? req.query.movieId : req.matches[1];
@@ -228,10 +205,8 @@ group.route(
 		const outerFiles: Record<string, Uint8Array> = {};
 		let singleZipBuf: Buffer | null = null;
 		for (const id of ids) {
-			try {
-				const zipped = await MovieModel.packMovie(id);
-				if (ids.length === 1) {
-					singleZipBuf = zipped;
+			try { const zipped = await MovieModel.packMovie(id);
+				if (ids.length === 1) { singleZipBuf = zipped;
 					break;
 				}
 				fileUtil.addToZip(outerFiles, id + ".zip", zipped);
@@ -245,14 +220,9 @@ group.route(
 			}
 		}
 		let zipBuf: Buffer;
-		if (singleZipBuf) {
-			zipBuf = singleZipBuf;
-		} else {
-			zipBuf = Buffer.from(zipSync(outerFiles));
-		}
-		if (isPost) {
-			zipBuf = Buffer.concat([Buffer.alloc(1, 0), zipBuf]);
-		}
+		if (singleZipBuf) { zipBuf = singleZipBuf; }
+		else { zipBuf = Buffer.from(zipSync(outerFiles)); }
+		if (isPost) { zipBuf = Buffer.concat([Buffer.alloc(1, 0), zipBuf]); }
 		res.setHeader("Content-Type", "application/zip");
 		res.end(zipBuf);
 	}
@@ -275,16 +245,13 @@ group.route("POST", ["/goapi/saveMovie/", "/goapi/saveTemplate/"], async (req, r
 	}
 	const body = Buffer.from(zipField, "base64");
 	let thumb: Buffer | void;
-	if (thumbField) {
-		thumb = Buffer.from(thumbField, "base64");
-	}
+	if (thumbField) { thumb = Buffer.from(thumbField, "base64"); }
 	if (!body.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]))) {
 		return res.status(400).end("body_zip is not a ZIP");
 	}
 	try {
 		const files = unzipSync(new Uint8Array(body));
 		const movieXmlU8 = files["movie.xml"];
-
 		if (!movieXmlU8) {
 			return res.status(400).end("movie.xml not found in zip");
 		}
