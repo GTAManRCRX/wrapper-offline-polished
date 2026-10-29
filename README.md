@@ -10,6 +10,8 @@ This project is important for archival purposes, as the ability to use the legac
 
 ### Wrapper offline 2.1.1 - Polished edition
 This version is a complete overhaul of the original 2.1.0 source code. Over 40+ critical bugs have been fixed, unnecessary dependencies removed, and the core packages swapped for maximum compatibility and portability
+### Important note regarding the Linux x86 binary
+If you have newer Linux distributions installed that dropped support for x86 libraries that release won't start on your computer
 ### Major architectural changes
 - Sharp → FFmpeg migration: Replaced the binary-heavy Sharp with FFmpeg as that is a Wrapper offline dependency anyways. This enables 100% native Windows 7 support without needing VxKex or any kernel extensions
 - Pure portability: Separated temp and userdata from %APPDATA%. All data now stays within the program’s resources folder, leaving ZERO footprint in your appdata folder
