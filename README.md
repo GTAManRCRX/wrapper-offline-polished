@@ -66,9 +66,6 @@ To build a full copy of Wrapper offline
 ```
 npm run package
 ```
-### This version of Wrapper offline doesn't support censorship and rant videos
-Therefore can't be used for any kinds of rants and "calling out users" types of vids. First Amendment allows users to do whatever they want and you can't change it
-
 ### License
 Most of this project is free/libre software under the MIT license. You have the freedom to run, change, and share this as much as you want
 FFmpeg is under the GNU GPLv2 license, which grants similar rights, but has some differences from MIT. Flash player (`resources/extensions`) and GoAnimate's original assets (`resources/static`) are proprietary and do not grant you these rights, but if they did, this project wouldn't need to exist
