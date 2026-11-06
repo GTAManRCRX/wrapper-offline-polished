@@ -166,10 +166,10 @@
 	<background id="wall23.swf" name="Floor" enable="Y" default="N" is_premium="N" aid="11772" money="0" sharing="0"/>
 	<background id="wall24.swf" name="Floor" enable="Y" default="N" is_premium="N" aid="11773" money="0" sharing="0"/>
 	<background id="ncc_corridor.swf" name="Corridor" enable="Y" default="N" is_premium="Y" aid="11855" money="0" sharing="0"/>
-	<background id="ncc_civilwar.swf" name="Us civil war map" enable="Y" default="N" is_premium="N" aid="11994" money="0" sharing="0"/>
+	<background id="ncc_civilwar.swf" name="US civil war map" enable="Y" default="N" is_premium="N" aid="11994" money="0" sharing="0"/>
 	<background id="ncc_revolu_bg.swf" name="Independence hall" enable="Y" default="N" is_premium="N" aid="11995" money="0" sharing="0"/>
-	<background id="ncc_revolu_map.swf" name="Us revolutionary war map" enable="Y" default="N" is_premium="N" aid="11996" money="0" sharing="0"/>
-	<background id="ncc_usmap.swf" name="Us map" enable="Y" default="N" is_premium="Y" aid="11997" money="0" sharing="0"/>
+	<background id="ncc_revolu_map.swf" name="US revolutionary war map" enable="Y" default="N" is_premium="N" aid="11996" money="0" sharing="0"/>
+	<background id="ncc_usmap.swf" name="US map" enable="Y" default="N" is_premium="Y" aid="11997" money="0" sharing="0"/>
 	<background id="ncc_warland.swf" name="Battlefield" enable="Y" default="N" is_premium="Y" aid="11998" money="0" sharing="0"/>
 	<background id="wall25.swf" name="Wallpaper" enable="Y" default="N" is_premium="N" aid="11999" money="0" sharing="0"/>
 	<background id="wall26.swf" name="Wallpaper" enable="Y" default="N" is_premium="N" aid="12000" money="0" sharing="0"/>
@@ -201,7 +201,7 @@
 	<background id="ncc_fx_10.swf" name="Speed lines" enable="Y" default="N" is_premium="Y" aid="12388" money="0" sharing="0"/>
 	<background id="ncc_pirateship01_bg.swf" name="Ship's side" enable="Y" default="N" is_premium="N" aid="12432" money="0" sharing="0"/>
 	<background id="ncc_pirateship01_deck.swf" name="Ship's deck" enable="Y" default="N" is_premium="N" aid="12433" money="0" sharing="0"/>
-	<background id="16_9.swf" name="16-9" enable="Y" default="N" is_premium="N" aid="12437" money="0" sharing="0"/>
+	<background id="16_9.swf" name="16:9" enable="Y" default="N" is_premium="N" aid="12437" money="0" sharing="0"/>
 	<compositebg id="court" name="Court" enable="Y" default="N" thumb="court.jpg" display_order="0" is_premium="N" money="0" sharing="0" aid="3163">
 	<bg id="COURTBG10" index="0">
 		<file>common.court_bg_v1.swf</file>
@@ -16204,7 +16204,7 @@
 	<prop id="ncc_oasis.swf" name="Oasis" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="10959" money="0" sharing="0"/>
 	<prop id="ncc_police_station01.swf" name="Police station" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="10967" money="0" sharing="0"/>
 	<prop id="ncc_police_station02.swf" name="Police station" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="10968" money="0" sharing="0"/>
-	<prop id="ncc_map01.swf" name="Us map" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="10969" money="0" sharing="0"/>
+	<prop id="ncc_map01.swf" name="US map" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="10969" money="0" sharing="0"/>
 	<prop id="ncc_namecard_stand.swf" name="Namecard holder" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="10970" money="0" sharing="0"/>
 	<prop id="msp_switch" name="Light switch" holdable="0" placeable="1" wearable="0" facing="left" thumb="msp_switch_ncc_switch_off.swf" enable="Y" is_premium="N" aid="10971" money="0" sharing="0">
 		<state id="msp_switch_ncc_switch_off.swf" name="Off" enable="Y" default="Y"/>

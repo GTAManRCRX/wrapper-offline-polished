@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <theme id="ninjaanime" name="Ninja anime" cc_theme_id="ninjaanime">
-  <background id="ninja01_bg.swf" name="Traditional japanese home - fooftop" enable="N" default="N" is_premium="N" aid="17541" money="0" sharing="0"/>
-  <background id="ninja02_bg.swf" name="Traditional japanese home - dojo" enable="N" default="N" is_premium="N" aid="17542" money="0" sharing="0"/>
-  <background id="ninja09_bg.swf" name="Traditional japanese home - garden" enable="N" default="N" is_premium="N" aid="17549" money="0" sharing="0"/>
-  <background id="ninja08_bg.swf" name="Traditional japanese home - dojo" enable="N" default="N" is_premium="N" aid="17548" money="0" sharing="0"/>
+  <background id="ninja01_bg.swf" name="Traditional Japanese home - Rooftop" enable="N" default="N" is_premium="N" aid="17541" money="0" sharing="0"/>
+  <background id="ninja02_bg.swf" name="Traditional Japanese home - Dojo" enable="N" default="N" is_premium="N" aid="17542" money="0" sharing="0"/>
+  <background id="ninja09_bg.swf" name="Traditional Japanese home - Garden" enable="N" default="N" is_premium="N" aid="17549" money="0" sharing="0"/>
+  <background id="ninja08_bg.swf" name="Traditional Japanese home - Dojo" enable="N" default="N" is_premium="N" aid="17548" money="0" sharing="0"/>
   <background id="ninja03_bg.swf" name="Forest" enable="N" default="N" is_premium="N" aid="17543" money="0" sharing="0"/>
   <background id="ninja04_bg.swf" name="Forest" enable="N" default="N" is_premium="N" aid="17544" money="0" sharing="0"/>
   <background id="ninja05_bg.swf" name="Forest" enable="N" default="N" is_premium="N" aid="17545" money="0" sharing="0"/>
@@ -16,20 +16,20 @@
   <background id="ninja13_bg.swf" name="Street" enable="N" default="N" is_premium="N" aid="17553" money="0" sharing="0"/>
   <background id="ninja14_bg.swf" name="Street" enable="N" default="N" is_premium="N" aid="17554" money="0" sharing="0"/>
   <background id="ninja17_bg.swf" name="Street" enable="N" default="N" is_premium="N" aid="17556" money="0" sharing="0"/>
-  <background id="house06_bg.swf" name="Traditional japanese home - hill side" enable="N" default="N" is_premium="N" aid="17538" money="0" sharing="0"/>
-  <background id="house01_bg.swf" name="Traditional japanese home - garden" enable="N" default="N" is_premium="N" aid="17533" money="0" sharing="0"/>
-  <background id="house03_bg.swf" name="Traditional japanese home - entrance" enable="N" default="N" is_premium="N" aid="17535" money="0" sharing="0"/>
-  <background id="house08_bg.swf" name="Traditional japanese home - hallway" enable="N" default="N" is_premium="N" aid="17540" money="0" sharing="0"/>
-  <background id="house07_bg.swf" name="Traditional japanese home - walkway" enable="N" default="N" is_premium="N" aid="17539" money="0" sharing="0"/>
-  <background id="house04_bg.swf" name="Traditional japanese home - garden" enable="N" default="N" is_premium="N" aid="17536" money="0" sharing="0"/>
-  <background id="house05_bg.swf" name="Traditional japanese home - study" enable="N" default="N" is_premium="N" aid="17537" money="0" sharing="0"/>
-  <background id="house02_bg.swf" name="Traditional japanese home - living room" enable="N" default="N" is_premium="N" aid="17534" money="0" sharing="0"/>
-  <compositebg id="cbg_house06" name="Traditional japanese home - hill side" enable="Y" default="N" thumb="house06.jpg" display_order="11" is_premium="N" money="0" sharing="0" aid="17562">
+  <background id="house06_bg.swf" name="Traditional Japanese home - Hill side" enable="N" default="N" is_premium="N" aid="17538" money="0" sharing="0"/>
+  <background id="house01_bg.swf" name="Traditional Japanese home - Garden" enable="N" default="N" is_premium="N" aid="17533" money="0" sharing="0"/>
+  <background id="house03_bg.swf" name="Traditional Japanese home - Entrance" enable="N" default="N" is_premium="N" aid="17535" money="0" sharing="0"/>
+  <background id="house08_bg.swf" name="Traditional Japanese home - Hallway" enable="N" default="N" is_premium="N" aid="17540" money="0" sharing="0"/>
+  <background id="house07_bg.swf" name="Traditional Japanese home - Walkway" enable="N" default="N" is_premium="N" aid="17539" money="0" sharing="0"/>
+  <background id="house04_bg.swf" name="Traditional Japanese home - Garden" enable="N" default="N" is_premium="N" aid="17536" money="0" sharing="0"/>
+  <background id="house05_bg.swf" name="Traditional Japanese home - Study" enable="N" default="N" is_premium="N" aid="17537" money="0" sharing="0"/>
+  <background id="house02_bg.swf" name="Traditional Japanese home - Living room" enable="N" default="N" is_premium="N" aid="17534" money="0" sharing="0"/>
+  <compositebg id="cbg_house06" name="Traditional Japanese home - Hill side" enable="Y" default="N" thumb="house06.jpg" display_order="11" is_premium="N" money="0" sharing="0" aid="17562">
   <bg id="cbg_house06_BG36" index="0">
     <file>ninjaanime.house06_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_house01" name="Traditional japanese home - garden" enable="Y" default="N" thumb="house01.jpg" display_order="12" is_premium="N" money="0" sharing="0" aid="17557">
+  <compositebg id="cbg_house01" name="Traditional Japanese home - Garden" enable="Y" default="N" thumb="house01.jpg" display_order="12" is_premium="N" money="0" sharing="0" aid="17557">
   <bg id="cbg_house01_BG37" index="0">
     <file>ninjaanime.house01_bg.swf</file>
   </bg>
@@ -43,17 +43,17 @@
     <rotation>0</rotation>
   </prop>
 </compositebg>
-  <compositebg id="cbg_house03" name="Traditional japanese home - entrance" enable="Y" default="N" thumb="house03.jpg" display_order="13" is_premium="N" money="0" sharing="0" aid="17559">
+  <compositebg id="cbg_house03" name="Traditional Japanese home - Entrance" enable="Y" default="N" thumb="house03.jpg" display_order="13" is_premium="N" money="0" sharing="0" aid="17559">
   <bg id="cbg_house03_BG39" index="0">
     <file>ninjaanime.house03_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_house08" name="Traditional japanese home - hallway" enable="Y" default="N" thumb="house08.jpg" display_order="14" is_premium="N" money="0" sharing="0" aid="17564">
+  <compositebg id="cbg_house08" name="Traditional Japanese home - Hallway" enable="Y" default="N" thumb="house08.jpg" display_order="14" is_premium="N" money="0" sharing="0" aid="17564">
   <bg id="cbg_house08_BG40" index="0">
     <file>ninjaanime.house08_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_house07" name="Traditional japanese home - walkway" enable="Y" default="N" thumb="house07.jpg" display_order="15" is_premium="N" money="0" sharing="0" aid="17563">
+  <compositebg id="cbg_house07" name="Traditional Japanese home - Walkway" enable="Y" default="N" thumb="house07.jpg" display_order="15" is_premium="N" money="0" sharing="0" aid="17563">
   <bg id="cbg_house07_BG41" index="0">
     <file>ninjaanime.house07_bg.swf</file>
   </bg>
@@ -67,7 +67,7 @@
     <rotation>0</rotation>
   </prop>
 </compositebg>
-  <compositebg id="cbg_house04" name="Traditional japanese home - garden" enable="Y" default="N" thumb="house04.jpg" display_order="16" is_premium="N" money="0" sharing="0" aid="17560">
+  <compositebg id="cbg_house04" name="Traditional Japanese home - Garden" enable="Y" default="N" thumb="house04.jpg" display_order="16" is_premium="N" money="0" sharing="0" aid="17560">
   <bg id="cbg_house04_BG44" index="0">
     <file>ninjaanime.house04_bg.swf</file>
   </bg>
@@ -81,12 +81,12 @@
     <rotation>0</rotation>
   </prop>
 </compositebg>
-  <compositebg id="cbg_house05" name="Traditional japanese home - study" enable="Y" default="N" thumb="house05.jpg" display_order="17" is_premium="N" money="0" sharing="0" aid="17561">
+  <compositebg id="cbg_house05" name="Traditional Japanese home - Study" enable="Y" default="N" thumb="house05.jpg" display_order="17" is_premium="N" money="0" sharing="0" aid="17561">
   <bg id="cbg_house05_BG46" index="0">
     <file>ninjaanime.house05_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_house02" name="Traditional japanese home - living room" enable="Y" default="N" thumb="house02.jpg" display_order="18" is_premium="N" money="0" sharing="0" aid="17558">
+  <compositebg id="cbg_house02" name="Traditional Japanese home - Living room" enable="Y" default="N" thumb="house02.jpg" display_order="18" is_premium="N" money="0" sharing="0" aid="17558">
   <bg id="cbg_house02_BG47" index="0">
     <file>ninjaanime.house02_bg.swf</file>
   </bg>
@@ -118,7 +118,7 @@
     <rotation>0</rotation>
   </prop>
 </compositebg>
-  <compositebg id="cbg_ninja01" name="Village - rooftops" enable="Y" default="N" thumb="ninja01.jpg" display_order="50" is_premium="N" money="0" sharing="0" aid="17565">
+  <compositebg id="cbg_ninja01" name="Village - Rooftops" enable="Y" default="N" thumb="ninja01.jpg" display_order="50" is_premium="N" money="0" sharing="0" aid="17565">
   <bg id="cbg_ninja01_BG3" index="0">
     <file>ninjaanime.ninja01_bg.swf</file>
   </bg>
@@ -128,7 +128,7 @@
     <file>ninjaanime.ninja02_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_ninja09" name="House - garden" enable="Y" default="N" thumb="ninja09.jpg" display_order="52" is_premium="N" money="0" sharing="0" aid="17573">
+  <compositebg id="cbg_ninja09" name="House - Garden" enable="Y" default="N" thumb="ninja09.jpg" display_order="52" is_premium="N" money="0" sharing="0" aid="17573">
   <bg id="cbg_ninja09_BG6" index="0">
     <file>ninjaanime.ninja09_bg.swf</file>
   </bg>
@@ -258,7 +258,7 @@
     <file>ninjaanime.ninja07_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_ninja10" name="Village - street" enable="Y" default="N" thumb="ninja10.jpg" display_order="60" is_premium="N" money="0" sharing="0" aid="17574">
+  <compositebg id="cbg_ninja10" name="Village - Street" enable="Y" default="N" thumb="ninja10.jpg" display_order="60" is_premium="N" money="0" sharing="0" aid="17574">
   <bg id="cbg_ninja10_BG26" index="0">
     <file>ninjaanime.ninja10_bg.swf</file>
   </bg>
@@ -272,17 +272,17 @@
     <rotation>0</rotation>
   </prop>
 </compositebg>
-  <compositebg id="cbg_ninja11" name="Village - street" enable="Y" default="N" thumb="ninja11.jpg" display_order="61" is_premium="N" money="0" sharing="0" aid="17575">
+  <compositebg id="cbg_ninja11" name="Village - Street" enable="Y" default="N" thumb="ninja11.jpg" display_order="61" is_premium="N" money="0" sharing="0" aid="17575">
   <bg id="cbg_ninja11_BG28" index="0">
     <file>ninjaanime.ninja11_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_ninja12" name="Village - street" enable="Y" default="N" thumb="ninja12.jpg" display_order="62" is_premium="N" money="0" sharing="0" aid="17576">
+  <compositebg id="cbg_ninja12" name="Village - Street" enable="Y" default="N" thumb="ninja12.jpg" display_order="62" is_premium="N" money="0" sharing="0" aid="17576">
   <bg id="cbg_ninja12_BG29" index="0">
     <file>ninjaanime.ninja12_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_ninja13" name="Village - street" enable="Y" default="N" thumb="ninja13.jpg" display_order="63" is_premium="N" money="0" sharing="0" aid="17577">
+  <compositebg id="cbg_ninja13" name="Village - Street" enable="Y" default="N" thumb="ninja13.jpg" display_order="63" is_premium="N" money="0" sharing="0" aid="17577">
   <bg id="cbg_ninja13_BG30" index="0">
     <file>ninjaanime.ninja13_bg.swf</file>
   </bg>
@@ -305,12 +305,12 @@
     <rotation>0</rotation>
   </prop>
 </compositebg>
-  <compositebg id="cbg_ninja14" name="Village - bridge" enable="Y" default="N" thumb="ninja14.jpg" display_order="64" is_premium="N" money="0" sharing="0" aid="17578">
+  <compositebg id="cbg_ninja14" name="Village - Bridge" enable="Y" default="N" thumb="ninja14.jpg" display_order="64" is_premium="N" money="0" sharing="0" aid="17578">
   <bg id="cbg_ninja14_BG33" index="0">
     <file>ninjaanime.ninja14_bg.swf</file>
   </bg>
 </compositebg>
-  <compositebg id="cbg_ninja17" name="Village - bridge" enable="Y" default="N" thumb="ninja17.jpg" display_order="65" is_premium="N" money="0" sharing="0" aid="17580">
+  <compositebg id="cbg_ninja17" name="Village - Bridge" enable="Y" default="N" thumb="ninja17.jpg" display_order="65" is_premium="N" money="0" sharing="0" aid="17580">
   <bg id="cbg_ninja17_BG34" index="0">
     <file>ninjaanime.ninja17_bg.swf</file>
   </bg>

@@ -8,7 +8,7 @@
 			<action id="sp_move01a.swf" name="Hadouken - prepare" loop="N" totalframe="6" enable="Y" aid="6344"/>
 			<action id="sp_move01b.swf" name="Hadouken - release" loop="N" totalframe="28" enable="Y" aid="6345"/>
 			<action id="sp_move02.swf" name="Shoryuken" loop="N" totalframe="25" enable="Y" aid="6346"/>
-			<action id="sp_move03.swf" name="Tatsumaki senpuukyaku" loop="Y" totalframe="7" enable="Y" aid="6347"/>
+			<action id="sp_move03.swf" name="Tatsumaki Senpuukyaku" loop="Y" totalframe="7" enable="Y" aid="6347"/>
 		</category>
 		<category name="Emotion">
 			<action id="thinking.swf" name="Thinking" loop="Y" totalframe="134" enable="Y" aid="6348"/>
