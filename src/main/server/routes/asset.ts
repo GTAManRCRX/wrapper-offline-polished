@@ -163,7 +163,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 				if (finalExt != "swf") {
 					await smoothTo(progressId, 18, 200);
 					await new Promise((resolve, reject) => {
-						const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", filepath, "-vf", "scale=550:354:flags=bicubic,unsharp=3:3:0.5:3:3:0.0", "-f", "image2pipe", "-vcodec", "png", "-"]);
+						const child = spawn(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", filepath, "-vf", "scale=1119:720:flags=bicubic,unsharp=3:3:0.5:3:3:0.0", "-f", "image2pipe", "-vcodec", "png", "-"]);
 						const chunks: Buffer[] = [];
 						child.stdout.on("data", (chunk) => chunks.push(chunk));
 						child.on("close", (code) => { if (code === 0) { stream = Readable.from(Buffer.concat(chunks)); finalExt = "png"; resolve(true); } else { reject(new Error(`FFmpeg exit code ${code}`)); } });
