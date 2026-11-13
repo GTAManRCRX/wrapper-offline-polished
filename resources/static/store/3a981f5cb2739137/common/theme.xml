@@ -15626,6 +15626,7 @@
 	<prop id="stethoscope.swf" name="Stethoscope" holdable="0" placeable="1" wearable="1" facing="left" thumb="" enable="Y" is_premium="N" aid="3356" money="0" sharing="0"/>
 	<prop id="timothy.swf" name="Timothy" holdable="1" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="3357" money="0" sharing="0" handstyle="stick"/>
 	<prop id="tool_box.swf" name="Tool box" holdable="1" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="3358" money="0" sharing="0"/>
+	<prop id="transparent_rectangle.swf" name="Transparent rectangle" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="20000" money="0" sharing="0"/>
 	<prop id="ufo.swf" name="UFO" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="3359" money="0" sharing="0"/>
 	<prop id="walking_stick.swf" name="Walking stick" holdable="1" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="3360" money="0" sharing="0" handstyle="stick"/>
 	<prop id="water_dispenser.swf" name="Water dispenser" holdable="0" placeable="1" wearable="0" facing="left" thumb="" enable="Y" is_premium="N" aid="3361" money="0" sharing="0"/>
