@@ -232,7 +232,7 @@ group.route("POST", "/api/asset/upload", async (req, res) => {
 					await smoothTo(progressId, 12, 200);
 					const durationSec = parseFloat(ffdata.format?.duration || "1") || 1;
 					await new Promise<void>((resolve, reject) => {
-						const args = ["-hide_banner", "-loglevel", "error", "-progress", "pipe:2", "-y", "-i", filepath, "-vf", "scale=350:-2", "-c:v", "flv", "-q:v", "2", temppath];
+						const args = ["-hide_banner", "-loglevel", "error", "-progress", "pipe:2", "-y", "-i", filepath, "-c:v", "flv", "-q:v", "2", temppath];
 						const child = spawn(ffmpegPath, args);
 						let lastPct = 12;
 						child.stderr.setEncoding("utf8");
