@@ -19480,53 +19480,51 @@
 	<effect id="ncc_opening01b.swf" type="ANIME" resize="false" move="false" name="Ending" enable="Y" is_premium="N" aid="12344" money="0" sharing="0" display_order="27"/>
 	<effect id="fade_in.swf" type="ANIME" resize="false" move="false" name="Fade in" enable="Y" is_premium="N" aid="3454" money="0" sharing="0" display_order="28"/>
 	<effect id="fade_out.swf" type="ANIME" resize="false" move="false" name="Fade out" enable="Y" is_premium="N" aid="3455" money="0" sharing="0" display_order="29"/>
-	<effect id="fadeInEx" x="0" y="0" w="550" h="354" rotate="0" type="FADING" resize="false" move="false" name="Fade in external" enable="Y" isIn="true" is_premium="N" money="0" sharing="0" aid="9816" display_order="30"/>
-	<effect id="fadeOutEx" x="0" y="0" w="550" h="354" rotate="0" type="FADING" resize="false" move="false" name="Fade out external" enable="Y" isOut="true" is_premium="N" money="0" sharing="0" aid="9817" display_order="31"/>
-	<effect id="firespring" x="0" y="0" w="550" h="354" rotate="0" type="FIRESPRING" resize="false" move="false" name="Fire spring" enable="Y" is_premium="N" aid="3437" money="0" sharing="0" display_order="32"/>
-	<effect id="firework" x="0" y="0" w="550" h="354" rotate="0" type="FIREWORK" resize="false" move="false" name="Firework" enable="Y" is_premium="N" aid="3436" money="0" sharing="0" display_order="33"/>
-	<effect id="flash_light01.swf" type="ANIME" resize="false" move="false" name="Flashlight" enable="Y" is_premium="N" aid="3456" money="0" sharing="0" display_order="34"/>
-	<effect id="ncc_ninja_fx01.swf" type="ANIME" resize="false" move="false" name="Focus" enable="Y" is_premium="N" aid="23190" money="0" sharing="0" display_order="35"/>
-	<effect id="ncc_ninja_fx03.swf" type="ANIME" resize="false" move="false" name="Focus 2" enable="Y" is_premium="N" aid="23192" money="0" sharing="0" display_order="36"/>
-	<effect id="ncc_fx_07.swf" type="ANIME" resize="false" move="false" name="Focus 3" enable="Y" is_premium="N" aid="12365" money="0" sharing="0" display_order="37"/>
-	<effect id="gnn_news.swf" type="ANIME" resize="false" move="false" name="GNN news" enable="Y" is_premium="N" aid="3457" money="0" sharing="0" display_order="38"/>
-	<effect id="effect_grayscale" x="0" y="0" w="550" h="354" rotate="0" type="GRAYSCALE" resize="false" move="false" name="Grayscale" enable="Y" aid="6796" is_premium="N" money="0" sharing="0" display_order="39" />
-	<effect id="green_screen.swf" type="ANIME" resize="false" move="false" name="Green screen" enable="Y" is_premium="N" aid="3458" money="0" sharing="0" display_order="40"/>
-	<effect id="hearts.swf" type="ANIME" resize="false" move="false" name="Heart" enable="Y" is_premium="N" aid="3445" money="0" sharing="0" display_order="41"/>
-	<effect id="ncc_ninja_fx02.swf" type="ANIME" resize="false" move="false" name="Hit" enable="Y" is_premium="N" aid="23191" money="0" sharing="0" display_order="42"/>
-	<effect id="hovering" x="0" y="0" w="550" h="354" rotate="0" type="HOVERING" resize="false" move="false" name="Hovering" enable="Y" is_premium="N" aid="5686" money="0" sharing="0" display_order="43"/>
-	<effect id="hyper_snow.swf" type="ANIME" resize="false" move="false" name="Hyper snow" enable="Y" is_premium="N" aid="3441" money="0" sharing="0" display_order="44"/>
-	<effect id="lightening.swf" type="ANIME" resize="false" move="false" name="Lightning" enable="Y" is_premium="N" aid="3439" money="0" sharing="0" display_order="45"/>
-	<effect id="ncc_ending02b.swf" type="ANIME" resize="false" move="false" name="Metal doors - Closing" enable="Y" is_premium="N" aid="12335" money="0" sharing="0" display_order="46"/>
-	<effect id="ncc_ending02.swf" type="ANIME" resize="false" move="false" name="Metal doors - Game over" enable="Y" is_premium="N" aid="12334" money="0" sharing="0" display_order="47"/>
-	<effect id="ncc_opening02.swf" type="ANIME" resize="false" move="false" name="Metal doors - Opening" enable="Y" is_premium="N" aid="12333" money="0" sharing="0" display_order="48"/>
-	<effect id="ncc_fx_nightvision.swf" type="ANIME" resize="false" move="false" name="Night vision goggles" enable="Y" is_premium="N" aid="12472" money="0" sharing="0" display_order="49"/>
-	<effect id="old_film_effect.swf" type="ANIME" resize="false" move="false" name="Old film" enable="Y" is_premium="N" aid="3444" money="0" sharing="0" display_order="50"/>
-	<effect id="old_film_effect_04.swf" type="ANIME" resize="false" move="false" name="Old film 2" enable="Y" is_premium="N" aid="9818" money="0" sharing="0" display_order="51"/>
-	<effect id="ncc_opening01.swf" type="ANIME" resize="false" move="false" name="Opening" enable="Y" is_premium="N" aid="12332" money="0" sharing="0" display_order="52"/>
-	<effect id="pan" x="0" y="0" w="275" h="177" rotate="0" type="ZOOM" resize="true" move="true" name="Pan" enable="Y" isPan="true" is_premium="N" aid="8233" money="0" sharing="0" display_order="53"/>
-	<effect id="ppl01.swf" type="ANIME" resize="false" move="false" name="People" enable="Y" is_premium="N" aid="3459" money="0" sharing="0" display_order="54"/>
-	<effect id="ncc_ninja_fx04.swf" type="ANIME" resize="false" move="false" name="Purple petals" enable="Y" is_premium="N" aid="23193" money="0" sharing="0" display_order="55"/>
-	<effect id="ncc_sci004fx.swf" type="ANIME" resize="false" move="false" name="Red alert" enable="Y" is_premium="N" aid="23188" money="0" sharing="0" display_order="56"/>
-	<effect id="ncc_fight01.swf" type="ANIME" resize="false" move="false" name="Round 1" enable="Y" is_premium="N" aid="12340" money="0" sharing="0" display_order="57"/>
-	<effect id="ncc_fight02.swf" type="ANIME" resize="false" move="false" name="Round 2" enable="Y" is_premium="N" aid="12341" money="0" sharing="0" display_order="58"/>
-	<effect id="ncc_jp_sakura.swf" type="ANIME" resize="false" move="false" name="Sakura" enable="Y" is_premium="N" aid="23194" money="0" sharing="0" display_order="59"/>
-	<effect id="ncc_sci003fx.swf" type="ANIME" resize="false" move="false" name="Screenviewer" enable="Y" is_premium="N" aid="23187" money="0" sharing="0" display_order="60"/>
-	<effect id="effect_spedia" x="0" y="0" w="550" h="354" rotate="0" type="SEPIA" resize="false" move="false" name="Sepia" enable="Y" aid="6877" is_premium="N" money="0" sharing="0" display_order="61" />
-	<effect id="snow.swf" type="ANIME" resize="false" move="false" name="Snow" enable="Y" is_premium="N" aid="3440" money="0" sharing="0" display_order="62"/>
-	<effect id="snow02.swf" type="ANIME" resize="false" move="false" name="Snow 2" enable="Y" is_premium="N" aid="3443" money="0" sharing="0" display_order="63"/>
-	<effect id="snow01.swf" type="ANIME" resize="false" move="false" name="Snow 3" enable="Y" is_premium="N" aid="3442" money="0" sharing="0" display_order="64"/>
-	<effect id="ncc_sci002fx.swf" type="ANIME" resize="false" move="false" name="Snowstorm" enable="Y" is_premium="N" aid="23186" money="0" sharing="0" display_order="65"/>
-	<effect id="ncc_fx_06.swf" type="ANIME" resize="false" move="false" name="Spotlight" enable="Y" is_premium="N" aid="12364" money="0" sharing="0" display_order="66"/>
-	<effect id="spray.swf" type="ANIME" resize="false" move="false" name="Spray" enable="Y" is_premium="N" aid="10965" money="0" sharing="0" display_order="67"/>
-	<effect id="ncc_fx_sniper.swf" type="ANIME" resize="false" move="false" name="Target" enable="Y" is_premium="N" aid="12473" money="0" sharing="0" display_order="68"/>
-	<effect id="ncc_fx_sniper_fire.swf" type="ANIME" resize="false" move="false" name="Target - Shoot" enable="Y" is_premium="N" aid="12474" money="0" sharing="0" display_order="69"/>
-	<effect id="ncc_transition04.swf" type="ANIME" resize="false" move="false" name="Transition in - Horizontal squares" enable="Y" is_premium="N" aid="12338" money="0" sharing="0" display_order="70"/>
-	<effect id="ncc_transition04b.swf" type="ANIME" resize="false" move="false" name="Transition out - Horizontal squares" enable="Y" is_premium="N" aid="12339" money="0" sharing="0" display_order="71"/>
-	<effect id="ncc_transition03.swf" type="ANIME" resize="false" move="false" name="Transition in - Vertical squares" enable="Y" is_premium="N" aid="12336" money="0" sharing="0" display_order="72"/>
-	<effect id="ncc_transition03b.swf" type="ANIME" resize="false" move="false" name="Transition out - Vertical squares" enable="Y" is_premium="N" aid="12337" money="0" sharing="0" display_order="73"/>
-	<effect id="upsideDown" x="0" y="0" w="550" h="354" rotate="0" type="UPSIDEDOWN" resize="false" move="false" name="Upside down" enable="Y" is_premium="N" aid="3435" money="0" sharing="0" display_order="74"/>
-	<effect id="water_flood.swf" type="ANIME" resize="false" move="false" name="Water flood" enable="Y" is_premium="N" aid="3461" money="0" sharing="0" display_order="75"/>
-	<effect id="ncc_fight04.swf" type="ANIME" resize="false" move="false" name="You lose" enable="Y" is_premium="N" aid="12343" money="0" sharing="0" display_order="76"/>
-	<effect id="ncc_fight03.swf" type="ANIME" resize="false" move="false" name="You win" enable="Y" is_premium="N" aid="12342" money="0" sharing="0" display_order="77"/>
-	<effect id="zoom" x="0" y="0" w="275" h="177" rotate="0" type="ZOOM" resize="true" move="true" name="Zoom" enable="Y" is_premium="N" aid="3432" money="0" sharing="0" display_order="78"/>
+	<effect id="firespring" x="0" y="0" w="550" h="354" rotate="0" type="FIRESPRING" resize="false" move="false" name="Fire spring" enable="Y" is_premium="N" aid="3437" money="0" sharing="0" display_order="30"/>
+	<effect id="firework" x="0" y="0" w="550" h="354" rotate="0" type="FIREWORK" resize="false" move="false" name="Firework" enable="Y" is_premium="N" aid="3436" money="0" sharing="0" display_order="31"/>
+	<effect id="flash_light01.swf" type="ANIME" resize="false" move="false" name="Flashlight" enable="Y" is_premium="N" aid="3456" money="0" sharing="0" display_order="32"/>
+	<effect id="ncc_ninja_fx01.swf" type="ANIME" resize="false" move="false" name="Focus" enable="Y" is_premium="N" aid="23190" money="0" sharing="0" display_order="33"/>
+	<effect id="ncc_ninja_fx03.swf" type="ANIME" resize="false" move="false" name="Focus 2" enable="Y" is_premium="N" aid="23192" money="0" sharing="0" display_order="34"/>
+	<effect id="ncc_fx_07.swf" type="ANIME" resize="false" move="false" name="Focus 3" enable="Y" is_premium="N" aid="12365" money="0" sharing="0" display_order="35"/>
+	<effect id="gnn_news.swf" type="ANIME" resize="false" move="false" name="GNN news" enable="Y" is_premium="N" aid="3457" money="0" sharing="0" display_order="36"/>
+	<effect id="effect_grayscale" x="0" y="0" w="550" h="354" rotate="0" type="GRAYSCALE" resize="false" move="false" name="Grayscale" enable="Y" aid="6796" is_premium="N" money="0" sharing="0" display_order="37" />
+	<effect id="green_screen.swf" type="ANIME" resize="false" move="false" name="Green screen" enable="Y" is_premium="N" aid="3458" money="0" sharing="0" display_order="38"/>
+	<effect id="hearts.swf" type="ANIME" resize="false" move="false" name="Heart" enable="Y" is_premium="N" aid="3445" money="0" sharing="0" display_order="39"/>
+	<effect id="ncc_ninja_fx02.swf" type="ANIME" resize="false" move="false" name="Hit" enable="Y" is_premium="N" aid="23191" money="0" sharing="0" display_order="40"/>
+	<effect id="hovering" x="0" y="0" w="550" h="354" rotate="0" type="HOVERING" resize="false" move="false" name="Hovering" enable="Y" is_premium="N" aid="5686" money="0" sharing="0" display_order="41"/>
+	<effect id="hyper_snow.swf" type="ANIME" resize="false" move="false" name="Hyper snow" enable="Y" is_premium="N" aid="3441" money="0" sharing="0" display_order="42"/>
+	<effect id="lightening.swf" type="ANIME" resize="false" move="false" name="Lightning" enable="Y" is_premium="N" aid="3439" money="0" sharing="0" display_order="43"/>
+	<effect id="ncc_ending02b.swf" type="ANIME" resize="false" move="false" name="Metal doors - Closing" enable="Y" is_premium="N" aid="12335" money="0" sharing="0" display_order="44"/>
+	<effect id="ncc_ending02.swf" type="ANIME" resize="false" move="false" name="Metal doors - Game over" enable="Y" is_premium="N" aid="12334" money="0" sharing="0" display_order="45"/>
+	<effect id="ncc_opening02.swf" type="ANIME" resize="false" move="false" name="Metal doors - Opening" enable="Y" is_premium="N" aid="12333" money="0" sharing="0" display_order="46"/>
+	<effect id="ncc_fx_nightvision.swf" type="ANIME" resize="false" move="false" name="Night vision goggles" enable="Y" is_premium="N" aid="12472" money="0" sharing="0" display_order="47"/>
+	<effect id="old_film_effect.swf" type="ANIME" resize="false" move="false" name="Old film" enable="Y" is_premium="N" aid="3444" money="0" sharing="0" display_order="48"/>
+	<effect id="old_film_effect_04.swf" type="ANIME" resize="false" move="false" name="Old film 2" enable="Y" is_premium="N" aid="9818" money="0" sharing="0" display_order="49"/>
+	<effect id="ncc_opening01.swf" type="ANIME" resize="false" move="false" name="Opening" enable="Y" is_premium="N" aid="12332" money="0" sharing="0" display_order="50"/>
+	<effect id="pan" x="0" y="0" w="275" h="177" rotate="0" type="ZOOM" resize="true" move="true" name="Pan" enable="Y" isPan="true" is_premium="N" aid="8233" money="0" sharing="0" display_order="51"/>
+	<effect id="ppl01.swf" type="ANIME" resize="false" move="false" name="People" enable="Y" is_premium="N" aid="3459" money="0" sharing="0" display_order="52"/>
+	<effect id="ncc_ninja_fx04.swf" type="ANIME" resize="false" move="false" name="Purple petals" enable="Y" is_premium="N" aid="23193" money="0" sharing="0" display_order="53"/>
+	<effect id="ncc_sci004fx.swf" type="ANIME" resize="false" move="false" name="Red alert" enable="Y" is_premium="N" aid="23188" money="0" sharing="0" display_order="54"/>
+	<effect id="ncc_fight01.swf" type="ANIME" resize="false" move="false" name="Round 1" enable="Y" is_premium="N" aid="12340" money="0" sharing="0" display_order="55"/>
+	<effect id="ncc_fight02.swf" type="ANIME" resize="false" move="false" name="Round 2" enable="Y" is_premium="N" aid="12341" money="0" sharing="0" display_order="56"/>
+	<effect id="ncc_jp_sakura.swf" type="ANIME" resize="false" move="false" name="Sakura" enable="Y" is_premium="N" aid="23194" money="0" sharing="0" display_order="57"/>
+	<effect id="ncc_sci003fx.swf" type="ANIME" resize="false" move="false" name="Screenviewer" enable="Y" is_premium="N" aid="23187" money="0" sharing="0" display_order="58"/>
+	<effect id="effect_spedia" x="0" y="0" w="550" h="354" rotate="0" type="SEPIA" resize="false" move="false" name="Sepia" enable="Y" aid="6877" is_premium="N" money="0" sharing="0" display_order="59" />
+	<effect id="snow.swf" type="ANIME" resize="false" move="false" name="Snow" enable="Y" is_premium="N" aid="3440" money="0" sharing="0" display_order="60"/>
+	<effect id="snow02.swf" type="ANIME" resize="false" move="false" name="Snow 2" enable="Y" is_premium="N" aid="3443" money="0" sharing="0" display_order="61"/>
+	<effect id="snow01.swf" type="ANIME" resize="false" move="false" name="Snow 3" enable="Y" is_premium="N" aid="3442" money="0" sharing="0" display_order="62"/>
+	<effect id="ncc_sci002fx.swf" type="ANIME" resize="false" move="false" name="Snowstorm" enable="Y" is_premium="N" aid="23186" money="0" sharing="0" display_order="63"/>
+	<effect id="ncc_fx_06.swf" type="ANIME" resize="false" move="false" name="Spotlight" enable="Y" is_premium="N" aid="12364" money="0" sharing="0" display_order="64"/>
+	<effect id="spray.swf" type="ANIME" resize="false" move="false" name="Spray" enable="Y" is_premium="N" aid="10965" money="0" sharing="0" display_order="65"/>
+	<effect id="ncc_fx_sniper.swf" type="ANIME" resize="false" move="false" name="Target" enable="Y" is_premium="N" aid="12473" money="0" sharing="0" display_order="66"/>
+	<effect id="ncc_fx_sniper_fire.swf" type="ANIME" resize="false" move="false" name="Target - Shoot" enable="Y" is_premium="N" aid="12474" money="0" sharing="0" display_order="67"/>
+	<effect id="ncc_transition04.swf" type="ANIME" resize="false" move="false" name="Transition in - Horizontal squares" enable="Y" is_premium="N" aid="12338" money="0" sharing="0" display_order="68"/>
+	<effect id="ncc_transition04b.swf" type="ANIME" resize="false" move="false" name="Transition out - Horizontal squares" enable="Y" is_premium="N" aid="12339" money="0" sharing="0" display_order="69"/>
+	<effect id="ncc_transition03.swf" type="ANIME" resize="false" move="false" name="Transition in - Vertical squares" enable="Y" is_premium="N" aid="12336" money="0" sharing="0" display_order="70"/>
+	<effect id="ncc_transition03b.swf" type="ANIME" resize="false" move="false" name="Transition out - Vertical squares" enable="Y" is_premium="N" aid="12337" money="0" sharing="0" display_order="71"/>
+	<effect id="upsideDown" x="0" y="0" w="550" h="354" rotate="0" type="UPSIDEDOWN" resize="false" move="false" name="Upside down" enable="Y" is_premium="N" aid="3435" money="0" sharing="0" display_order="72"/>
+	<effect id="water_flood.swf" type="ANIME" resize="false" move="false" name="Water flood" enable="Y" is_premium="N" aid="3461" money="0" sharing="0" display_order="73"/>
+	<effect id="ncc_fight04.swf" type="ANIME" resize="false" move="false" name="You lose" enable="Y" is_premium="N" aid="12343" money="0" sharing="0" display_order="74"/>
+	<effect id="ncc_fight03.swf" type="ANIME" resize="false" move="false" name="You win" enable="Y" is_premium="N" aid="12342" money="0" sharing="0" display_order="75"/>
+	<effect id="zoom" x="0" y="0" w="275" h="177" rotate="0" type="ZOOM" resize="true" move="true" name="Zoom" enable="Y" is_premium="N" aid="3432" money="0" sharing="0" display_order="76"/>
 </theme>
