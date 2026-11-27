@@ -21,7 +21,7 @@
 		"vue-router": "5.4.0"
 	},
 	"devDependencies": {
-		"@electron/packager": "18.3.6",
+		"@electron/packager": "20.0.0",
 		"@vitejs/plugin-vue": "6.0.10",
 		"concurrently": "10.0.6",
 		"electron": "11.5.0",
